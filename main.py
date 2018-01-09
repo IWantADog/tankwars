@@ -4,6 +4,7 @@ from pygame.sprite import Group
 from tank import Tank
 from ai_tank import AiTank
 from point import Point
+from collide import player_ai_collide, player_bullet_collide
 import sys
 
 if __name__ == '__main__':
@@ -17,13 +18,13 @@ if __name__ == '__main__':
     boss_point = Point(300, 300)
 
     #player
-    tt = Tank('tank.png', 2)
+    player = Tank('tank.png', 2)
 
     #player bullent group
     bullet_group = Group()
 
     #ai_tank
-    ai1 = AiTank(tt.point, boss_point)
+    ai = AiTank(player.point, boss_point)
     # ai1.start()
 
     #ai_tank bullent group
@@ -32,9 +33,12 @@ if __name__ == '__main__':
 
 
     #tank group
-    group = Group()
-    group.add(tt)
-    group.add(ai1)
+    player_group = Group()
+    player_group.add(player)
+
+    #ai tank group
+    ai_group = Group()
+    ai_group.add(ai)
 
 
     while True:
@@ -47,42 +51,53 @@ if __name__ == '__main__':
 
         keys = pygame.key.get_pressed()
         if keys[K_w]:
-            tt.move('w')
+            player.move('w')
         elif keys[K_s]:
-            tt.move('s')
+            player.move('s')
         elif keys[K_a]:
-            tt.move('a')
+            player.move('a')
         elif keys[K_d]:
-            tt.move('d')
+            player.move('d')
 
         if keys[K_j]:
-            new_bullet = tt.shoot(current_time, 300)
+            new_bullet = player.shoot(current_time, 300)
             if new_bullet:
                 bullet_group.add(new_bullet)
-            # pass
 
+        # clear bullet
         for bullet in bullet_group.sprites():
             if not bullet.islive:
                 bullet_group.remove(bullet)
-                # passj
 
-        # ai1.running(current_time)
-        ai1.ai_move(current_time, 3000)
-        ai_tank_bullet = ai1.ai_shoot(current_time, 300)
+        # clear ai which boom is 0(表示加载完毕了死亡图片)
+        for item in ai_group.sprites():
+            if item.boom == 0:
+                ai_group.remove(item)
+
+        # ai move&shooting module
+        ai.ai_move(current_time, 3000)
+        ai_tank_bullet = ai.ai_shoot(current_time, 300)
         if ai_tank_bullet:
             ai_bullet_group.add(ai_tank_bullet)
 
         for bullet in ai_bullet_group.sprites():
             if not bullet.islive:
                 ai_bullet_group.remove(bullet)
-                # passj
 
-        # print('1111 ', len(bullet_group.sprites()))
+        #player-ai collide
+        player_ai_collide(player, ai_group)
+
+        #play bullets collide
+        player_bullet_collide(bullet_group, ai_group)
+
+
         screen.fill((0,0,0))
 
-        group.update(current_time)
-        group.draw(screen)
+        player_group.update(current_time)
+        ai_group.update(current_time)
 
+        player_group.draw(screen)
+        ai_group.draw(screen)
 
         bullet_group.update()
         ai_bullet_group.update()
