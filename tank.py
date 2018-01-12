@@ -3,11 +3,12 @@ from pygame.locals import *
 from pygame.sprite import Sprite, Group
 from point import Point
 from bullet import Bullet
-from config import tank_width,tank_height, bullet_height, bullet_width, birth_img, boom_img
+from wall import Brickwall
+from config import img_width, img_height, bullet_height, bullet_width, birth_img, boom_img
 import sys
 
 class Tank(Sprite):
-    def __init__(self,filename, columns, width=tank_width, height=tank_width):
+    def __init__(self,filename, columns, width=img_width, height=img_height):
         Sprite.__init__(self)
         #self.image = pygame.image.load(filename).convert_alpha()
         self.frame = 2
@@ -152,6 +153,13 @@ if __name__ == '__main__':
 
     bullet_group = Group()
 
+    #wall group
+    wall_group = Group()
+    #brickwall
+    bwall = Brickwall(300, 100)
+
+    wall_group.add(bwall)
+
     while True:
         framerate.tick(30)
         current_time = pygame.time.get_ticks()
@@ -191,6 +199,8 @@ if __name__ == '__main__':
         bullet_group.update()
         bullet_group.draw(screen)
 
-
+        #wall_group
+        wall_group.update()
+        wall_group.draw(screen)
 
         pygame.display.update()

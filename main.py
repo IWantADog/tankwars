@@ -4,7 +4,10 @@ from pygame.sprite import Group
 from tank import Tank
 from ai_tank import AiTank
 from point import Point
-from collide import player_ai_collide, player_bullet_collide
+from wall import Brickwall, Steelwall
+from boss import Boss
+from collide import player_ai_collide, player_bullet_collide, tank_wall_collide\
+    , bullet_wall_collide, ai_bullent_collide, tank_boss_collide
 import sys
 
 if __name__ == '__main__':
@@ -30,7 +33,14 @@ if __name__ == '__main__':
     #ai_tank bullent group
     ai_bullet_group = Group()
 
+    #wall
+    bwall = Brickwall(300, 100)
+    swall = Steelwall(300, 140)
 
+    #wall group
+    wall_group = Group()
+    wall_group.add(bwall)
+    wall_group.add(swall)
 
     #tank group
     player_group = Group()
@@ -40,6 +50,12 @@ if __name__ == '__main__':
     ai_group = Group()
     ai_group.add(ai)
 
+
+    #boss
+    boss = Boss(200, 210)
+    #boss group
+    boss_group = Group()
+    boss_group.add(boss)
 
     while True:
         framerate.tick(30)
@@ -74,6 +90,11 @@ if __name__ == '__main__':
             if item.boom == 0:
                 ai_group.remove(item)
 
+        # clear wall which wall life is 0
+        for item in wall_group.sprites():
+            if item.life <= 0:
+                wall_group.remove(item)
+
         # ai move&shooting module
         ai.ai_move(current_time, 3000)
         ai_tank_bullet = ai.ai_shoot(current_time, 300)
@@ -90,6 +111,21 @@ if __name__ == '__main__':
         #play bullets collide
         player_bullet_collide(bullet_group, ai_group)
 
+        #tank walls collide
+        tank_wall_collide(player_group, wall_group)
+        tank_wall_collide(ai_group, wall_group)
+
+        #bullents walls collide
+        bullet_wall_collide(bullet_group, wall_group)
+        bullet_wall_collide(ai_bullet_group, wall_group)
+
+        #tank boss collide
+        tank_boss_collide(player_group, boss)
+        tank_boss_collide(ai_group, boss)
+
+        #ai bullet collide
+        ai_bullent_collide(player, ai_bullet_group)
+        ai_bullent_collide(boss, ai_bullet_group)
 
         screen.fill((0,0,0))
 
@@ -98,6 +134,12 @@ if __name__ == '__main__':
 
         player_group.draw(screen)
         ai_group.draw(screen)
+
+        wall_group.update()
+        wall_group.draw(screen)
+
+        boss_group.update()
+        boss_group.draw(screen)
 
         bullet_group.update()
         ai_bullet_group.update()

@@ -36,6 +36,8 @@ class Bullet(pygame.sprite.Sprite):
         frame_y = 0
         rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
         self.image = self.master_imge.subsurface(rect)
+        self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
+
 
     def move(self):
         if self.dire == 'w':
