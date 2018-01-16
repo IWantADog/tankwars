@@ -4,11 +4,13 @@ from pygame.sprite import Sprite, Group
 from point import Point
 from bullet import Bullet
 from wall import Brickwall
-from config import img_width, img_height, bullet_height, bullet_width, birth_img, boom_img
 import sys
+from config import img_width, img_height, bullet_height, bullet_width,\
+    birth_img, boom_img, windows_height, windows_width, area_height, area_width\
+    , default_point
 
 class Tank(Sprite):
-    def __init__(self,filename, columns, width=img_width, height=img_height):
+    def __init__(self,filename, columns, point=default_point, width=img_width, height=img_height):
         Sprite.__init__(self)
         #self.image = pygame.image.load(filename).convert_alpha()
         self.frame = 2
@@ -28,7 +30,7 @@ class Tank(Sprite):
         self.ismoved = False                 # 是否移动
         self.dirct = 'w'                     # 方向
         self.old_dirct = -1                  # 上一次的方向
-        self.point = Point(200, 100)         # 位置
+        self.point = point                   # 位置
         self.speed = 3                       # 速度
         self.rect = Rect(self.point.x, self.point.y, width, height)
         self.collide_dirct = {'w': False, 's': False, 'a': False, 'd': False}  # 碰撞方向
@@ -87,13 +89,13 @@ class Tank(Sprite):
 
             if self.point.x < 0:
                 self.point.x = 0
-            elif self.point.x > 460:
-                self.point.x = 460
+            elif self.point.x > area_width - img_width:
+                self.point.x = area_width - img_width
 
             if self.point.y < 0:
                 self.point.y = 0
-            elif self.point.y > 460:
-                self.point.y = 460
+            elif self.point.y > area_height - img_height:
+                self.point.y = area_height - img_height
 
             self.collide_dirct = {'w': False, 's': False, 'a': False, 'd': False}
             self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)

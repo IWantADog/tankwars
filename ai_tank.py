@@ -5,7 +5,8 @@ from point import Point
 
 class AiTank(Tank):
     def __init__(self, aim_tank, aim_boss): #目标坦克坐标，目标boos坐标
-        Tank.__init__(self, tank_img, 2)
+        point = random.choice([Point(0, 0),  Point(250, 0), Point(460, 0)])
+        Tank.__init__(self, tank_img, 2, point=point)
 
         # self.brain = StateMachine()
         # exploring_state = TankExploring(self)
@@ -18,7 +19,6 @@ class AiTank(Tank):
         self.state = False               # 是否发现目标
         self.speed = 1
         self.last_move_time = 0
-        self.point = random.choice([Point(0, 0),  Point(250, 0), Point(460, 0)])
 
     def find_aim(self):   # 返回ai需要移动的方向
         tank_x, tank_y = self.point.get()

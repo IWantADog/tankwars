@@ -48,9 +48,9 @@ def player_bullet_collide(play_bullet, ai_group):
         collide_list = pygame.sprite.spritecollide(item, play_bullet, True)
         item.lost_life(len(collide_list))
 
-def ai_bullent_collide(player, ai_bullet):
-    collide_list = pygame.sprite.spritecollide(player, ai_bullet, True)
-    player.lost_life(len(collide_list))
+def ai_bullent_collide(tank, ai_bullet):
+    collide_list = pygame.sprite.spritecollide(tank, ai_bullet, True)
+    tank.lost_life(len(collide_list))
 
 def tank_wall_collide(tank_group, wall_group):
     collide_list = pygame.sprite.groupcollide(tank_group, wall_group, False, False)

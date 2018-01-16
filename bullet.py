@@ -1,7 +1,7 @@
 import pygame
 from point import Point
 from pygame import Rect
-from config import bullet_height, bullet_width
+from config import bullet_height, bullet_width, area_width, area_height
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self):
@@ -49,8 +49,8 @@ class Bullet(pygame.sprite.Sprite):
         elif self.dire == 'd':
             self.point.x += self.speed
 
-        if self.point.x < 0 or self.point.x > 490 or \
-                        self.point.y < 0 or self.point.y > 490:
+        if self.point.x < 0 or self.point.x > area_width - bullet_width or \
+                        self.point.y < 0 or self.point.y > area_height - bullet_height:
             self.islive = False
 
         self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
