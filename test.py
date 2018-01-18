@@ -2,46 +2,66 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Group
 from tank import Tank
-from ai_tank import AiTank
+from ai_tank import AiTank, GiftTank, BossTank
 from point import Point
 from wall import Brickwall, Steelwall
 from boss import Boss
-from config import tank_img
+import sys
+from map import load_map
 from collide import player_ai_collide, player_bullet_collide, tank_wall_collide\
     , bullet_wall_collide, ai_bullent_collide, tank_boss_collide
-import sys
+from config import windows_width, windows_height, background, ai_tank_tag, player_img,\
+    ai_number, number_img, tank_img
+
+
 
 if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode((500, 500))
+    screen = pygame.display.set_mode((windows_width, windows_height))
+
     pygame.display.set_caption('Tank Wars')
 
     framerate = pygame.time.Clock()
 
+    bg = pygame.image.load(background).convert()
+
+    p_img = pygame.image.load(player_img).convert_alpha()
+
+    ai_tag = pygame.image.load(ai_tank_tag).convert_alpha()
+    tag_point = [(925+(i%2)*25, 100+(i//2)*25) for i in range(3)]
+
+
     #boss
-    boss_point = Point(300, 300)
+    boss = Boss(450, 560)
+    #boss group
+    boss_group = Group()
+    boss_group.add(boss)
 
     #player
-    player = Tank(tank_img, point=Point(100,200))
+    player = Tank(tank_img)
+
+    number_master_img = pygame.image.load(number_img).convert_alpha()
+
 
     #player bullent group
     bullet_group = Group()
 
+    boss_point = boss.get_point()
     #ai_tank
-    ai = AiTank(player.point, boss_point)
-    # ai1.start()
+    now_ai_number = 3
+    ai_1 = AiTank(player.point, boss_point)
+    ai_2 = GiftTank(player.point, boss_point)
+    ai_3 = BossTank(player.point, boss_point)
+
 
     #ai_tank bullent group
     ai_bullet_group = Group()
 
-    #wall
-    bwall = Brickwall(Point(300, 100))
-    swall = Steelwall(Point(300, 140))
-
     #wall group
-    wall_group = Group()
-    wall_group.add(bwall)
-    wall_group.add(swall)
+    # bwall = Brickwall(Point(300, 100))
+    # swall = Steelwall(Point(300, 140))
+    wall_group = load_map()
+
 
     #tank group
     player_group = Group()
@@ -49,18 +69,17 @@ if __name__ == '__main__':
 
     #ai tank group
     ai_group = Group()
-    ai_group.add(ai)
+    ai_group.add(ai_1)
+    ai_group.add(ai_2)
+    ai_group.add(ai_3)
 
-
-    #boss
-    boss = Boss(200, 210)
-    #boss group
-    boss_group = Group()
-    boss_group.add(boss)
 
     while True:
         framerate.tick(30)
         current_time = pygame.time.get_ticks()
+
+        rect = Rect(player.get_life() * 18, 0, 18, 14)
+        number_img = number_master_img.subsurface(rect)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -81,15 +100,26 @@ if __name__ == '__main__':
             if new_bullet:
                 bullet_group.add(new_bullet)
 
+        # add ai tank
+        if len(ai_group.sprites()) < 3 and now_ai_number < ai_number:
+            ai_group.add(AiTank(player.point, boss_point))
+            ai_number += 1
+
         # clear bullet
         for bullet in bullet_group.sprites():
             if not bullet.islive:
                 bullet_group.remove(bullet)
 
+        # clear player
+        if player.get_life() == 0 and player.get_birth() <= 0:
+            player_group.remove(player)
+
         # clear ai which boom is 0(表示加载完毕了死亡图片)
         for item in ai_group.sprites():
             if item.boom == 0:
                 ai_group.remove(item)
+                if tag_point:
+                    tag_point.pop()
 
         # clear wall which wall life is 0
         for item in wall_group.sprites():
@@ -97,10 +127,11 @@ if __name__ == '__main__':
                 wall_group.remove(item)
 
         # ai move&shooting module
-        ai.ai_move(current_time, 3000)
-        ai_tank_bullet = ai.ai_shoot(current_time, 300)
-        if ai_tank_bullet:
-            ai_bullet_group.add(ai_tank_bullet)
+        for ai in ai_group.sprites():
+            ai.ai_move(current_time, 3000)
+            ai_tank_bullet = ai.ai_shoot(current_time, 300)
+            if ai_tank_bullet:
+                ai_bullet_group.add(ai_tank_bullet)
 
         for bullet in ai_bullet_group.sprites():
             if not bullet.islive:
@@ -108,6 +139,10 @@ if __name__ == '__main__':
 
         #player-ai collide
         player_ai_collide(player, ai_group)
+
+        # ai ai collide
+        for ai in ai_group.sprites():
+            player_ai_collide(ai, ai_group)
 
         #play bullets collide
         player_bullet_collide(bullet_group, ai_group)
@@ -147,6 +182,12 @@ if __name__ == '__main__':
 
         bullet_group.draw(screen)
         ai_bullet_group.draw(screen)
+
+        screen.blit(bg, (900, 0))
+        screen.blit(p_img, (925, 400))
+        screen.blit(number_img, (950, 400))
+        for tag in tag_point:
+            screen.blit(ai_tag, tag)
 
 
         pygame.display.update()

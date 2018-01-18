@@ -10,9 +10,8 @@ from config import img_width, img_height, bullet_height, bullet_width,\
     , default_point
 
 class Tank(Sprite):
-    def __init__(self,filename, columns, point=default_point, width=img_width, height=img_height):
+    def __init__(self, filename, columns=2, point=default_point, width=img_width, height=img_height):
         Sprite.__init__(self)
-        #self.image = pygame.image.load(filename).convert_alpha()
         self.frame = 2
         self.last_time = 0
         self.master_image = pygame.image.load(filename).convert_alpha()
@@ -45,7 +44,17 @@ class Tank(Sprite):
         self.collide_dirct[dirct] = True
 
     def lost_life(self, n):
-        self.life -= n
+        if self.life > 0:
+            self.life -= n
+
+        if self.life < 0:
+            self.life = 0
+
+    def get_life(self):
+        return self.life
+
+    def get_birth(self):
+        return self.birth
 
     def move(self, dire): #direction
         if self.life > 0:

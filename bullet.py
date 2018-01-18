@@ -1,7 +1,7 @@
 import pygame
 from point import Point
 from pygame import Rect
-from config import bullet_height, bullet_width, area_width, area_height
+from config import bullet_height, bullet_width, area_width, area_height, shoot_img
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self):
@@ -14,7 +14,7 @@ class Bullet(pygame.sprite.Sprite):
         self.islive = True
 
     def load(self, width=bullet_width, height=bullet_height):
-        self.master_imge = pygame.image.load('shoot.png').convert_alpha()
+        self.master_imge = pygame.image.load(shoot_img).convert_alpha()
         self.frame_width = width
         self.frame_height = height
 

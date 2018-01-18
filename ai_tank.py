@@ -1,23 +1,16 @@
 from tank import Tank
-from config import  tank_img
+from config import ai_tank_img, ai_boss_img, gift_tank_img
 import random
 from point import Point
 
 class AiTank(Tank):
-    def __init__(self, aim_tank, aim_boss): #目标坦克坐标，目标boos坐标
-        point = random.choice([Point(0, 0),  Point(250, 0), Point(460, 0)])
-        Tank.__init__(self, tank_img, 2, point=point)
-
-        # self.brain = StateMachine()
-        # exploring_state = TankExploring(self)
-        # shooting_state = TankShooting(self)
-        # self.brain.add_state(exploring_state)
-        # self.brain.add_state(shooting_state)
-
+    def __init__(self, aim_tank, aim_boss, tank_img=ai_tank_img): #目标坦克坐标，目标boos坐标
+        point = random.choice([Point(0, 0),  Point(450, 0), Point(860, 0)])
+        Tank.__init__(self, tank_img, point=point)
         self.aim_tank = aim_tank
         self.aim_boss = aim_boss
         self.state = False               # 是否发现目标
-        self.speed = 1
+        self.speed = 2
         self.last_move_time = 0
 
     def find_aim(self):   # 返回ai需要移动的方向
@@ -53,13 +46,6 @@ class AiTank(Tank):
         self.state = False
         return False
 
-    # def start(self):
-    #     self.brain.set_state('exploring')
-    #
-    # def running(self, current_time):
-    #     self.brain.think(current_time)
-    #     print('state: ', self.brain.active_state.name)
-
     def ai_move(self, current_time, rate=2000):
         dire = self.find_aim()
         if not dire:
@@ -75,8 +61,15 @@ class AiTank(Tank):
             return self.shoot(current_time=current_time, rate=rate)
 
 
+class GiftTank(AiTank):
+    def __init__(self, aim_tank, aim_boss):
+        AiTank.__init__(self, aim_tank=aim_tank, aim_boss=aim_boss, tank_img=gift_tank_img)
 
 
+class BossTank(AiTank):
+    def __init__(self, aim_tank, aim_boss):
+        AiTank.__init__(self, aim_tank=aim_tank, aim_boss=aim_boss, tank_img=ai_boss_img)
+        self.speed = 4
 
 
 

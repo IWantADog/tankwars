@@ -34,7 +34,7 @@ def get_collide_dirct(ppoint, apoint):
 
 def player_ai_collide(player, ai_group):
     for item in ai_group.sprites():
-        if pygame.sprite.collide_rect(player, item):
+        if player != item and pygame.sprite.collide_rect(player, item):
             pp = player.get_point()
             ip = item.get_point()
             pd, ad = get_collide_dirct(pp, ip)
