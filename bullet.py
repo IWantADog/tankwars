@@ -18,8 +18,8 @@ class Bullet(pygame.sprite.Sprite):
         self.frame_width = width
         self.frame_height = height
 
-    def lanch(self , point, dire): # 位置 方向
-        self.point = point
+    def lanch(self, point, dire): # 位置 方向
+        self.point = Point(point)
         self.dire = dire
         frame = None
         if dire == 'w':

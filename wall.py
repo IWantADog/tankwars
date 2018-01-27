@@ -9,9 +9,9 @@ class Brickwall(Sprite):
         Sprite.__init__(self)
         self.life = 3
         self.name = 'brickwall'
-        self.point = point
+        self.point = Point(point)
         self.image = pygame.image.load(brickwall_img).convert_alpha()
-        self.rect = Rect(point.x, point.y, img_width, img_height)
+        self.rect = Rect(self.point.x, self.point.y, img_width, img_height)
 
     def lost_life(self, n):
         self.life -= n
@@ -26,9 +26,9 @@ class Steelwall(Sprite):
         Sprite.__init__(self)
         self.life = 3
         self.name = 'steelwall'
-        self.point = point
+        self.point = Point(point)
         self.image = pygame.image.load(steelwall_img).convert_alpha()
-        self.rect = Rect(point.x, point.y, img_width, img_height)
+        self.rect = Rect(self.point.x, self.point.y, img_width, img_height)
 
     def lost_life(self, n):
         self.life -= n

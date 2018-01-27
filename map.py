@@ -4,15 +4,19 @@ from pygame.sprite import Group
 from point import Point
 
 def load_map():
-     brickwall_point_1 = [Point(150, 100+i*40) for i in range(8)]
-     brickwall_point_2 = [Point(350, 100+i*40) for i in range(8)]
-     brickwall_point_3 = [Point(550, 100+i*40) for i in range(8)]
-     brickwall_point_4 = [Point(750, 100+i*40) for i in range(8)]
-     brickwall_point_5 = [Point(410, 560), Point(490, 560), Point(410, 520),
-                          Point(450, 520), Point(490, 520)]
-     brickwall_point_6 = [Point(100 + i*40, 450) for i in range(5)]
-     brickwall_point_7 = [Point(640 + i*40, 450) for i in range(5)]
-     steelwall_point = [Point(0, 300), Point(860, 300)]
+     brickwall_point_1 = [(150, 100+i*40) for i in range(3)]
+     brickwall_point_2 = [(150, 280+i*40) for i in range(3)]
+     brickwall_point_3 = [(350, 100+i*40) for i in range(3)]
+     brickwall_point_4 = [(350, 280+i*40) for i in range(3)]
+     brickwall_point_5 = [(550, 100+i*40) for i in range(3)]
+     brickwall_point_6 = [(550, 280+i*40) for i in range(3)]
+     brickwall_point_7 = [(750, 100+i*40) for i in range(3)]
+     brickwall_point_8 = [(750, 280+i*40) for i in range(3)]
+     brickwall_point_9 = [(410, 560), (490, 560), (410, 520),
+                          (450, 520), (490, 520)]
+     brickwall_point_10 = [(100 + i*40, 450) for i in range(5)]
+     brickwall_point_11 = [(640 + i*40, 450) for i in range(5)]
+     steelwall_point = [(0, 300), (860, 300)]
 
      wall = []
      wall.extend(brickwall_point_1)
@@ -22,6 +26,10 @@ def load_map():
      wall.extend(brickwall_point_5)
      wall.extend(brickwall_point_6)
      wall.extend(brickwall_point_7)
+     wall.extend(brickwall_point_8)
+     wall.extend(brickwall_point_9)
+     wall.extend(brickwall_point_10)
+     wall.extend(brickwall_point_11)
 
      group = Group()
 

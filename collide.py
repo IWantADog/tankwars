@@ -42,6 +42,26 @@ def player_ai_collide(player, ai_group):
             player.set_collide_dirct(pd)
             item.set_collide_dirct(ad)
 
+def player_gift_collide(player, gift_group, ai_group, current_time, start_time):
+    collide_list = pygame.sprite.spritecollide(player, gift_group, True)
+    for gift in collide_list:
+        if gift.name == 'clock':
+            start_time = current_time
+            for ai in ai_group.sprites():
+                ai.state = 'clock'
+        elif gift.name == 'onelife':
+            player.add_life(1)
+
+    for ai in ai_group.sprites():
+        if ai.state == 'clock':
+            if current_time <= start_time + 5000:
+                for a in ai_group:
+                    a.state = 'clock'
+            else:
+                for a in ai_group:
+                    a.state = 'notfind'
+            break
+    return start_time
 
 def player_bullet_collide(play_bullet, ai_group):
     for item in ai_group.sprites():

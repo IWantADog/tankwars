@@ -29,7 +29,7 @@ class Tank(Sprite):
         self.ismoved = False                 # 是否移动
         self.dirct = 'w'                     # 方向
         self.old_dirct = -1                  # 上一次的方向
-        self.point = point                   # 位置
+        self.point = Point(point)                   # 位置
         self.speed = 3                       # 速度
         self.rect = Rect(self.point.x, self.point.y, width, height)
         self.collide_dirct = {'w': False, 's': False, 'a': False, 'd': False}  # 碰撞方向
@@ -42,6 +42,9 @@ class Tank(Sprite):
 
     def set_collide_dirct(self, dirct):
         self.collide_dirct[dirct] = True
+
+    def add_life(self, n):
+        self.life += n
 
     def lost_life(self, n):
         if self.life > 0:
@@ -118,7 +121,7 @@ class Tank(Sprite):
             dis_y = (self.frame_height/2) - (bullet_height/2)
             x += dis_x
             y += dis_y
-            bullet.lanch(Point(x, y), self.dirct)
+            bullet.lanch((x, y), self.dirct)
             self.last_shoot_time = current_time
             return bullet
 

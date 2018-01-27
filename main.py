@@ -6,9 +6,10 @@ from ai_tank import AiTank
 from point import Point
 from wall import Brickwall, Steelwall
 from boss import Boss
+from gift import Clock, OneLife
 from config import tank_img
 from collide import player_ai_collide, player_bullet_collide, tank_wall_collide\
-    , bullet_wall_collide, ai_bullent_collide, tank_boss_collide
+    , bullet_wall_collide, ai_bullent_collide, tank_boss_collide, player_gift_collide
 import sys
 
 if __name__ == '__main__':
@@ -57,6 +58,13 @@ if __name__ == '__main__':
     #boss group
     boss_group = Group()
     boss_group.add(boss)
+
+    gift_clock = Clock(Point(250, 200))
+    gift_onelife = OneLife(Point(250, 300))
+    # gift group
+    gift_group = Group()
+    gift_group.add(gift_clock)
+    gift_group.add(gift_onelife)
 
     while True:
         framerate.tick(30)
@@ -128,6 +136,9 @@ if __name__ == '__main__':
         ai_bullent_collide(player, ai_bullet_group)
         ai_bullent_collide(boss, ai_bullet_group)
 
+        #player gift collide
+        player_gift_collide(player, gift_group, ai_group)
+
         screen.fill((0,0,0))
 
         player_group.update(current_time)
@@ -141,6 +152,9 @@ if __name__ == '__main__':
 
         boss_group.update()
         boss_group.draw(screen)
+
+        gift_group.update()
+        gift_group.draw(screen)
 
         bullet_group.update()
         ai_bullet_group.update()

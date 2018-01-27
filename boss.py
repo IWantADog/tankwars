@@ -9,7 +9,7 @@ class Boss(Sprite):
         Sprite.__init__(self)
         self.life = 1
         self.master_img = pygame.image.load(boss_img).convert_alpha()
-        self.point = Point(point_x, point_y)
+        self.point = Point((point_x, point_y))
         self.rect = Rect(point_x, point_y, img_width, img_height)
 
     def get_point(self):
@@ -17,6 +17,9 @@ class Boss(Sprite):
 
     def lost_life(self, n):
         self.life -= n
+
+    def get_life(self):
+        return self.life
 
     def update(self, *args):
         if self.life > 0:
