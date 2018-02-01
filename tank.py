@@ -7,7 +7,7 @@ from wall import Brickwall
 import sys
 from config import img_width, img_height, bullet_height, bullet_width,\
     birth_img, boom_img, windows_height, windows_width, area_height, area_width\
-    , default_point
+    , default_point, tank_img
 
 class Tank(Sprite):
     def __init__(self, filename, columns=2, point=default_point, width=img_width, height=img_height):
@@ -157,11 +157,18 @@ class Tank(Sprite):
 
 if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode((500, 500))
+    pygame.mixer.init()
+
+    start_music = pygame.mixer.Sound('music\\start.ogg')
+    channel = pygame.mixer.find_channel(True)
+    channel.set_volume(0.5)
+    channel.play(start_music)
+
+    screen = pygame.display.set_mode((900, 600))
     pygame.display.set_caption('Tank Wars')
 
     framerate = pygame.time.Clock()
-    tt = Tank('tank.png', 2)
+    tt = Tank(tank_img, 2)
     group = Group()
     group.add(tt)
 
@@ -170,7 +177,7 @@ if __name__ == '__main__':
     #wall group
     wall_group = Group()
     #brickwall
-    bwall = Brickwall(300, 100)
+    bwall = Brickwall((300, 100))
 
     wall_group.add(bwall)
 
@@ -199,6 +206,7 @@ if __name__ == '__main__':
             # pass
 
         for bullet in bullet_group.sprites():
+            # print(bullet.point, bullet.start_point, bullet.point.get_distance(bullet.start_point))
             if not bullet.islive:
                 bullet_group.remove(bullet)
                 # passj

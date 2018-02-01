@@ -8,9 +8,16 @@ class Point():
     def get(self):
         return self.x, self.y
 
+    def get_distance(self, point):
+        return abs(self.x - point.x or self.y - point.y)
+
 
 if __name__ == '__main__':
     p = Point((1, 2))
-    print(p)
-    print(p.get())
-    print(p.x, p.y)
+    sp = Point((9, 2))
+    if -1:
+        print('aa')
+    # print(p)
+    # print(p.get())
+    # print(p.x, p.y)
+    print(p.get_distance(sp))

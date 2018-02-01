@@ -8,6 +8,7 @@ class Bullet(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         # 位置 方向 速度
         self.point = None
+        self.start_point = None
         self.dire = None
         self.speed = 8
         self.last_time = None
@@ -20,6 +21,7 @@ class Bullet(pygame.sprite.Sprite):
 
     def lanch(self, point, dire): # 位置 方向
         self.point = Point(point)
+        self.start_point = Point(point)
         self.dire = dire
         frame = None
         if dire == 'w':
@@ -50,7 +52,8 @@ class Bullet(pygame.sprite.Sprite):
             self.point.x += self.speed
 
         if self.point.x < 0 or self.point.x > area_width - bullet_width or \
-                        self.point.y < 0 or self.point.y > area_height - bullet_height:
+                        self.point.y < 0 or self.point.y > area_height - bullet_height or \
+                        self.start_point.get_distance(self.point) >= 300:
             self.islive = False
 
         self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
