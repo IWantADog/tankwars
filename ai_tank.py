@@ -1,12 +1,12 @@
 from tank import Tank
-from config import ai_tank_img, ai_boss_img, gift_tank_img
+from config import ai_tank_path, ai_boss_img, gift_tank_path
 import random
 from point import Point
 from gift import Clock, OneLife
 
 
 class AiTank(Tank):
-    def __init__(self, tank_img=ai_tank_img): #目标坦克坐标，目标boos坐标
+    def __init__(self, tank_img): #目标坦克坐标，目标boos坐标
         point = random.choice([(0, 0), (450, 0), (860, 0)])
         Tank.__init__(self, tank_img, point=point)
         self.state = 'notfind'               # 是否发现目标
@@ -58,14 +58,14 @@ class AiTank(Tank):
                     dire = self.dirct
             self.move(dire)
 
-    def ai_shoot(self, current_time, rate):
+    def ai_shoot(self, current_time, bullet_images, rate):
         if self.state == 'finded':
-            return self.shoot(current_time=current_time, rate=rate)
+            return self.shoot(current_time=current_time, bullet_images=bullet_images, rate=rate)
 
 
 class GiftTank(AiTank):
-    def __init__(self):
-        AiTank.__init__(self, tank_img=gift_tank_img)
+    def __init__(self, tank_images):
+        AiTank.__init__(self, tank_img=tank_images)
         self.name = 'gift'
 
     def leave_gift(self):
@@ -73,8 +73,8 @@ class GiftTank(AiTank):
         return random.choice(gift_list)
 
 class BossTank(AiTank):
-    def __init__(self):
-        AiTank.__init__(self, tank_img=ai_boss_img)
+    def __init__(self, tank_images):
+        AiTank.__init__(self, tank_img=tank_images)
         self.speed = 4
         self.name = 'boss'
 

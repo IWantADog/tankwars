@@ -1,10 +1,15 @@
 import pygame
 from point import Point
 from pygame import Rect
-from config import bullet_height, bullet_width, area_width, area_height, shoot_img
+from config import bullet_height, bullet_width, area_width, area_height
+
+def load_bullet_images():
+    images_name_list = ['images\\bullet\\up.png', 'images\\bullet\\down.png',
+                        'images\\bullet\\right.png', 'images\\bullet\\left.png']
+    return [pygame.image.load(item).convert_alpha() for item in images_name_list]
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, bullent_images):
         pygame.sprite.Sprite.__init__(self)
         # 位置 方向 速度
         self.point = None
@@ -13,32 +18,36 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = 8
         self.last_time = None
         self.islive = True
+        self.master_image = bullent_images
+        self.frame = None
+        self.width, self.height = None, None
 
-    def load(self, width=bullet_width, height=bullet_height):
-        self.master_imge = pygame.image.load(shoot_img).convert_alpha()
-        self.frame_width = width
-        self.frame_height = height
+    # def load(self, width=bullet_width, height=bullet_height):
+    #     self.master_imge = pygame.image.load(shoot_img).convert_alpha()
+    #     self.frame_width = width
+    #     self.frame_height = height
 
     def lanch(self, point, dire): # 位置 方向
         self.point = Point(point)
         self.start_point = Point(point)
         self.dire = dire
-        frame = None
         if dire == 'w':
-            frame = 0
+            self.frame = 0
         elif dire == 's':
-            frame = 1
+            self.frame = 1
         elif dire == 'd':
-            frame = 2
+            self.frame = 2
         elif dire == 'a':
-            frame = 3
+            self.frame = 3
 
         # print('dire %s, frame %d' % (dire, frame))
-        frame_x = frame * self.frame_width
-        frame_y = 0
-        rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
-        self.image = self.master_imge.subsurface(rect)
-        self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
+        # frame_x = frame * self.frame_width
+        # frame_y = 0
+        self.image = self.master_image[self.frame]
+        self.width, self.height = self.image.get_size()
+        # rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
+        # self.image = self.master_imge.subsurface(rect)
+        self.rect = Rect(self.point.x, self.point.y, self.width, self.height)
 
 
     def move(self):
@@ -56,7 +65,7 @@ class Bullet(pygame.sprite.Sprite):
                         self.start_point.get_distance(self.point) >= 300:
             self.islive = False
 
-        self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
+        self.rect = Rect(self.point.x, self.point.y, self.width, self.height)
 
     def update(self):
         if self.islive:
