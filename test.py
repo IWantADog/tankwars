@@ -8,14 +8,16 @@ from wall import Brickwall, Steelwall
 from gift import Clock, OneLife
 from boss import Boss
 import sys
-from map import load_map
+from map import load_map_1, load_map_2
 from collide import player_ai_collide, player_bullet_collide, tank_wall_collide\
     , bullet_wall_collide, ai_bullent_collide, tank_boss_collide, player_gift_collide
-from config import windows_width, windows_height, background, ai_tank_tag, player_img,\
-    ai_number, number_img, tank_img, start_img, gameover_img, start_music, shoot_music
+from config import windows_width, windows_height, background, ai_tank_tag,\
+    ai_number, number_img, player_tank_path, ai_tank_path, gift_tank_path, boss_1_path, bullet_path,\
+    start_img, gameover_img, start_music, shoot_music, load_images, player_img
 
 
-def init_game():
+def init_game(player_images, ai_images):
+
     # boss
     boss = Boss(450, 560)
     # boss group
@@ -23,22 +25,22 @@ def init_game():
     boss_group.add(boss)
 
     # player
-    player = Tank(tank_img)
+    player = Tank(player_images)
 
     # player bullent group
     bullet_group = Group()
 
     # ai_tank
     now_ai_number = 3
-    ai_1 = AiTank()
-    ai_2 = AiTank()
-    ai_3 = AiTank()
+    ai_1 = AiTank(ai_images)
+    ai_2 = AiTank(ai_images)
+    ai_3 = AiTank(ai_images)
 
     # ai_tank bullent group
     ai_bullet_group = Group()
 
     # wall group loading map
-    wall_group = load_map()
+    wall_group = load_map_1()
 
     # tank group
     player_group = Group()
@@ -94,10 +96,19 @@ if __name__ == '__main__':
     #shoot music
     music_shoot = pygame.mixer.Sound(shoot_music)
 
+    #load images
+    player_images = load_images(player_tank_path)
+    ai_images = load_images(ai_tank_path)
+    gift_images = load_images(gift_tank_path)
+    boss_1_images = load_images(boss_1_path)
+
     #init game
     player, boss, player_group, boss_group, ai_group, bullet_group,\
-        ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game()
+        ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images)
     play_music(music_start)
+
+    # bullent images
+    bullet_images = load_images(bullet_path)
 
     start_time = 0
     game_state = 'start'
@@ -121,9 +132,8 @@ if __name__ == '__main__':
             if keys[K_r]:
                 game_state = 'running'
                 player, boss, player_group, boss_group, ai_group, bullet_group,\
-                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game()
+                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images,ai_images)
                 play_music(music_start)
-
 
         elif game_state == 'running':
             framerate.tick(30)
@@ -143,7 +153,7 @@ if __name__ == '__main__':
                 player.move('d')
 
             if keys[K_j]:
-                new_bullet = player.shoot(current_time, 300)
+                new_bullet = player.shoot(current_time, bullet_images, 300)
                 if new_bullet:
                     play_music(music_shoot)
                     bullet_group.add(new_bullet)
@@ -151,11 +161,11 @@ if __name__ == '__main__':
             # add ai tank
             if len(ai_group.sprites()) < 5 and now_ai_number < ai_number:
                 if now_ai_number == 6 or now_ai_number == 15:
-                    ai_group.add(GiftTank())
+                    ai_group.add(GiftTank(gift_images))
                 elif now_ai_number == ai_number - 1:
-                    ai_group.add(BossTank())
+                    ai_group.add(BossTank(boss_1_images))
                 else:
-                    ai_group.add(AiTank())
+                    ai_group.add(AiTank(ai_images))
                 now_ai_number += 1
 
             # clear bullet
@@ -188,7 +198,7 @@ if __name__ == '__main__':
             # ai move&shooting module
             for ai in ai_group.sprites():
                 ai.ai_move(current_time, player.get_point(), boss.get_point(), rate=3000)
-                ai_tank_bullet = ai.ai_shoot(current_time, 300)
+                ai_tank_bullet = ai.ai_shoot(current_time, bullet_images, 300)
                 if ai_tank_bullet:
                     ai_bullet_group.add(ai_tank_bullet)
 
