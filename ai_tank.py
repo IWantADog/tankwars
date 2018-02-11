@@ -1,5 +1,6 @@
+import pygame
 from tank import Tank
-from config import ai_tank_path, ai_boss_img, gift_tank_path
+from config import boss_birth_img, boss_boom_img
 import random
 from point import Point
 from gift import Clock, OneLife
@@ -13,6 +14,8 @@ class AiTank(Tank):
         self.speed = 2
         self.last_move_time = 0
         self.name = 'ai'
+        self.distance = 150
+        self.range = 40
 
     def find_aim(self, aim_tank, aim_boss):   # 返回ai需要移动的方向
         tank_x, tank_y = self.point.get()
@@ -20,32 +23,35 @@ class AiTank(Tank):
         aim_boss_x, aim_boss_y = aim_boss.get()
 
         self.state = 'finded'
-        if -40 <= tank_x - aim_boss_x <= 40:
-            if 0 < aim_boss_y - tank_y <= 150:
+        if -self.range <= tank_x - aim_boss_x <= self.range:
+            if 0 < aim_boss_y - tank_y <= self.distance:
                 return 's'
-            elif 0 < tank_y - aim_boss_y <= 150:
+            elif 0 < tank_y - aim_boss_y <= self.distance:
                 return 'w'
 
-        if -40 <= tank_y - aim_boss_y <= 40:
-            if 0 < aim_boss_x - tank_x <= 150:
+        if -self.range <= tank_y - aim_boss_y <= self.range:
+            if 0 < aim_boss_x - tank_x <= self.distance:
                 return 'd'
-            elif 0 < tank_x - aim_boss_x <= 150:
+            elif 0 < tank_x - aim_boss_x <= self.distance:
                 return 'a'
 
-        if -40 <= tank_x - aim_tank_x <= 40:
-            if 0 < aim_tank_y - tank_y <= 150:
+        if -self.range <= tank_x - aim_tank_x <= self.range:
+            if 0 < aim_tank_y - tank_y <= self.distance:
                 return 's'
-            elif 0 < tank_y - aim_tank_y <= 150:
+            elif 0 < tank_y - aim_tank_y <= self.distance:
                 return 'w'
 
-        if -40 <= tank_y - aim_tank_y <= 40:
-            if 0 < aim_tank_x - tank_x <= 150:
+        if -self.range <= tank_y - aim_tank_y <= self.range:
+            if 0 < aim_tank_x - tank_x <= self.distance:
                 return 'd'
-            elif 0 < tank_x - aim_tank_x <= 150:
+            elif 0 < tank_x - aim_tank_x <= self.distance:
                 return 'a'
 
         self.state = 'notfind'
         return False
+
+    def get_name(self):
+        return self.name
 
     def ai_move(self, current_time, aim_player, aim_boss, rate=2000):
         if self.state != 'clock':
@@ -72,13 +78,23 @@ class GiftTank(AiTank):
         gift_list = [Clock(self.point), OneLife(self.point)]
         return random.choice(gift_list)
 
-class BossTank(AiTank):
+class BossTank_1(AiTank):
     def __init__(self, tank_images):
         AiTank.__init__(self, tank_img=tank_images)
         self.speed = 4
         self.name = 'boss'
 
-
+class BossTank_2(AiTank):
+    def __init__(self, tank_images):
+        AiTank.__init__(self, tank_img=tank_images)
+        self.speed = 4
+        self.name = 'boss'
+        self.birth_image = pygame.image.load(boss_birth_img).convert_alpha()
+        self.boom_image = pygame.image.load(boss_boom_img).convert_alpha()
+        self.frame_width = self.birth_image.get_width() // 4
+        self.frame_height = self.birth_image.get_height()
+        self.distance = 250
+        self.range = 40
 
 
 

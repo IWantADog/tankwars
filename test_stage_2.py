@@ -2,42 +2,48 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Group
 from tank import Tank
-from ai_tank import AiTank
+from ai_tank import AiTank, BossTank_2
 from point import Point
 from wall import Brickwall, Steelwall
 from boss import Boss
 from gift import Clock, OneLife
-from config import tank_img
+from config import player_tank_path, ai_tank_path, gift_tank_path, bullet_path, load_images\
+    , boss_2_path
 from collide import player_ai_collide, player_bullet_collide, tank_wall_collide\
     , bullet_wall_collide, ai_bullent_collide, tank_boss_collide, player_gift_collide
 import sys
 
 if __name__ == '__main__':
     pygame.init()
-    screen = pygame.display.set_mode((500, 500))
+    screen = pygame.display.set_mode((1000, 600))
     pygame.display.set_caption('Tank Wars')
 
     framerate = pygame.time.Clock()
 
     #boss
-    boss_point = Point(300, 300)
+    boss_point = Point((300, 300))
 
     #player
-    player = Tank(tank_img, point=Point(100,200))
+    player_images = load_images(player_tank_path)
+    player = Tank(player_images)
 
     #player bullent group
     bullet_group = Group()
 
     #ai_tank
-    ai = AiTank(player.point, boss_point)
+    ai_images = load_images(boss_2_path)
+    ai = BossTank_2(ai_images)
     # ai1.start()
 
     #ai_tank bullent group
     ai_bullet_group = Group()
 
+    #bullet images
+    bullet_images = load_images(bullet_path)
+
     #wall
-    bwall = Brickwall(Point(300, 100))
-    swall = Steelwall(Point(300, 140))
+    bwall = Brickwall((300, 100))
+    swall = Steelwall((300, 140))
 
     #wall group
     wall_group = Group()
@@ -59,12 +65,15 @@ if __name__ == '__main__':
     boss_group = Group()
     boss_group.add(boss)
 
-    gift_clock = Clock(Point(250, 200))
-    gift_onelife = OneLife(Point(250, 300))
+    # gift_images = load_images(gift_tank_path)
+    gift_clock = Clock(Point((250, 200)))
+    gift_onelife = OneLife(Point((250, 300)))
+
     # gift group
     gift_group = Group()
     gift_group.add(gift_clock)
     gift_group.add(gift_onelife)
+    start_time = 0
 
     while True:
         framerate.tick(30)
@@ -85,7 +94,7 @@ if __name__ == '__main__':
             player.move('d')
 
         if keys[K_j]:
-            new_bullet = player.shoot(current_time, 300)
+            new_bullet = player.shoot(current_time,bullet_images, 300)
             if new_bullet:
                 bullet_group.add(new_bullet)
 
@@ -105,8 +114,8 @@ if __name__ == '__main__':
                 wall_group.remove(item)
 
         # ai move&shooting module
-        ai.ai_move(current_time, 3000)
-        ai_tank_bullet = ai.ai_shoot(current_time, 300)
+        ai.ai_move(current_time, player.get_point(), boss.get_point(), rate=3000)
+        ai_tank_bullet = ai.ai_shoot(current_time, bullet_images, 300)
         if ai_tank_bullet:
             ai_bullet_group.add(ai_tank_bullet)
 
@@ -137,7 +146,7 @@ if __name__ == '__main__':
         ai_bullent_collide(boss, ai_bullet_group)
 
         #player gift collide
-        player_gift_collide(player, gift_group, ai_group)
+        start_time = player_gift_collide(player, gift_group, ai_group, current_time, start_time)
 
         screen.fill((0,0,0))
 

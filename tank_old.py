@@ -2,23 +2,23 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Sprite, Group
 from point import Point
-from bullet import Bullet, load_bullet_images
+from bullet import Bullet
 from wall import Brickwall
 import sys
 from config import img_width, img_height, bullet_height, bullet_width,\
     birth_img, boom_img, windows_height, windows_width, area_height, area_width\
-    , default_point, player_tank_path, ai_tank_path, bullet_path
+    , default_point, player_tank_path
 
 class Tank(Sprite):
-    def __init__(self, images_list, columns=2, point=default_point):
+    def __init__(self, filename, columns=2, point=default_point, width=img_width, height=img_height):
         Sprite.__init__(self)
         self.frame = 2
         self.last_time = 0
-        self.master_image = images_list
+        self.master_image = pygame.image.load(filename).convert_alpha()
         self.birth_image = pygame.image.load(birth_img).convert_alpha()
         self.boom_image = pygame.image.load(boom_img).convert_alpha()
-        self.frame_width = self.birth_image.get_width() // 4
-        self.frame_height = self.birth_image.get_height()
+        self.frame_width = width
+        self.frame_height = height
         self.columns = columns
         self.first_frame = 2
         self.last_frame = self.first_frame + columns - 1
@@ -31,7 +31,7 @@ class Tank(Sprite):
         self.old_dirct = -1                  # 上一次的方向
         self.point = Point(point)                   # 位置
         self.speed = 3                       # 速度
-        self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
+        self.rect = Rect(self.point.x, self.point.y, width, height)
         self.collide_dirct = {'w': False, 's': False, 'a': False, 'd': False}  # 碰撞方向
 
         #bullet
@@ -110,17 +110,18 @@ class Tank(Sprite):
                 self.point.y = area_height - img_height
 
             self.collide_dirct = {'w': False, 's': False, 'a': False, 'd': False}
+            self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
 
-    def shoot(self, current_time, bullet_images, rate=30):
+    def shoot(self, current_time, rate=30):
         if current_time > self.last_shoot_time + rate and self.life > 0:
-            bullet = Bullet(bullet_images)
-            bullet.choose_dire(self.dirct)
+            bullet = Bullet()
+            bullet.load(bullet_width, bullet_height)
             x, y = self.point.get()
-            dis_x = (self.frame_width/2) - (bullet.width/2)
-            dis_y = (self.frame_height/2) - (bullet.height/2)
+            dis_x = (self.frame_width/2) - (bullet_width/2)
+            dis_y = (self.frame_height/2) - (bullet_height/2)
             x += dis_x
             y += dis_y
-            bullet.lanch((x, y))
+            bullet.lanch((x, y), self.dirct)
             self.last_shoot_time = current_time
             return bullet
 
@@ -134,10 +135,10 @@ class Tank(Sprite):
                     self.last_time = current_time
                     self.ismoved = False
 
-            self.image = self.master_image[self.frame]
-            width, height = self.image.get_size()
-            self.rect = Rect(self.point.x, self.point.y, width, height)
-
+            frame_x = (self.frame % self.columns) * self.frame_width
+            frame_y = (self.frame // self.columns) * self.frame_height
+            rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
+            self.image = self.master_image.subsurface(rect)
         elif self.birth > 0:
             frame_x = (4 - self.birth) * self.frame_width
             frame_y = 0
@@ -154,10 +155,6 @@ class Tank(Sprite):
             self.boom -= 1
 
 
-def load_images(images_list):
-    return [pygame.image.load(item).convert_alpha() for item in images_list]
-
-
 if __name__ == '__main__':
     pygame.init()
     pygame.mixer.init()
@@ -171,24 +168,11 @@ if __name__ == '__main__':
     pygame.display.set_caption('Tank Wars')
 
     framerate = pygame.time.Clock()
-
-    #player
-    p_tank = load_images(player_tank_path)
-    tt = Tank(p_tank, 2)
+    tt = Tank(tank_img, 2)
     group = Group()
     group.add(tt)
 
-    #ai tank
-    ai_tank = load_images(ai_tank_path)
-    ai_t = AiTank(ai_tank)
-    ai_group = Group()
-    ai_group.add(ai_t)
-
-    #player bullent
     bullet_group = Group()
-
-    #ai bullet
-    ai_bullet_group = Group()
 
     #wall group
     wall_group = Group()
@@ -196,8 +180,6 @@ if __name__ == '__main__':
     bwall = Brickwall((300, 100))
 
     wall_group.add(bwall)
-
-    bullet_images = load_images(bullet_path)
 
     while True:
         framerate.tick(30)
@@ -218,7 +200,7 @@ if __name__ == '__main__':
             tt.move('d')
 
         if keys[K_j]:
-            new_bullet = tt.shoot(current_time,bullet_images, 300)
+            new_bullet = tt.shoot(current_time, 300)
             if new_bullet:
                 bullet_group.add(new_bullet)
             # pass
@@ -228,15 +210,6 @@ if __name__ == '__main__':
             if not bullet.islive:
                 bullet_group.remove(bullet)
                 # passj
-        for ai in ai_group.sprites():
-            ai.ai_move(current_time, p_tank.get_point(), p_tank.get_point(), rate=3000)
-            ai_tank_bullet = ai.ai_shoot(current_time, 300)
-            if ai_tank_bullet:
-                ai_bullet_group.add(ai_tank_bullet)
-
-        for bullet in ai_bullet_group.sprites():
-            if not bullet.islive:
-                ai_bullet_group.remove(bullet)
 
         # print('1111 ', len(bullet_group.sprites()))
         screen.fill((0,0,0))
@@ -244,14 +217,9 @@ if __name__ == '__main__':
         group.update(current_time)
         group.draw(screen)
 
-        ai_group.update(current_time)
-        ai_group.draw(screen)
 
         bullet_group.update()
         bullet_group.draw(screen)
-
-        ai_bullet_group.update()
-        ai_bullet_group.draw(screen)
 
         #wall_group
         wall_group.update()

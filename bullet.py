@@ -27,9 +27,7 @@ class Bullet(pygame.sprite.Sprite):
     #     self.frame_width = width
     #     self.frame_height = height
 
-    def lanch(self, point, dire): # 位置 方向
-        self.point = Point(point)
-        self.start_point = Point(point)
+    def choose_dire(self, dire):
         self.dire = dire
         if dire == 'w':
             self.frame = 0
@@ -40,13 +38,12 @@ class Bullet(pygame.sprite.Sprite):
         elif dire == 'a':
             self.frame = 3
 
-        # print('dire %s, frame %d' % (dire, frame))
-        # frame_x = frame * self.frame_width
-        # frame_y = 0
         self.image = self.master_image[self.frame]
         self.width, self.height = self.image.get_size()
-        # rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
-        # self.image = self.master_imge.subsurface(rect)
+
+    def lanch(self, point): # 位置 方向
+        self.point = Point(point)
+        self.start_point = Point(point)
         self.rect = Rect(self.point.x, self.point.y, self.width, self.height)
 
 

@@ -26,6 +26,9 @@ ai_tank_path = ['images\\ai_tank\\1-1-1.png', 'images\\ai_tank\\1-1-2.png',
 bullet_path = ['images\\bullet\\up.png', 'images\\bullet\\down.png',
                'images\\bullet\\right.png', 'images\\bullet\\left.png']
 
+boss_bullet_path = ['images\\final_boss_bullet\\up.png', 'images\\final_boss_bullet\\down.png',
+               'images\\final_boss_bullet\\right.png', 'images\\final_boss_bullet\\left.png']
+
 ai_boss_img = 'img\\ai_boss.png'
 gift_tank_path = ['images\\gift_tank\\dj1-1-1.png', 'images\\gift_tank\\dj1-1-2.png',
                  'images\\gift_tank\\dj1-2-1.png', 'images\\gift_tank\\dj1-2-2.png',
@@ -37,10 +40,17 @@ boss_1_path = ['images\\boss_tank\\m21-1-1.png', 'images\\boss_tank\\m21-1-2.png
                'images\\boss_tank\\m21-3-1.png', 'images\\boss_tank\\m21-3-2.png',
                'images\\boss_tank\\m21-4-1.png', 'images\\boss_tank\\m21-4-2.png']
 
+boss_2_path = ['images\\final_boss\\boss1-1-1.png', 'images\\final_boss\\boss1-1-2.png',
+               'images\\final_boss\\boss1-2-1.png', 'images\\final_boss\\boss1-2-2.png',
+               'images\\final_boss\\boss1-3-1.png', 'images\\final_boss\\boss1-3-2.png',
+               'images\\final_boss\\boss1-4-1.png', 'images\\final_boss\\boss1-4-2.png']
+
 clock_img = 'images\\others\\clock.png'
 one_life_img = 'images\\others\\one_life.png'
 birth_img = 'images\\others\\birth.png'
 boom_img = 'images\\others\\boom.png'
+boss_birth_img = 'images\\others\\boss_birth.png'
+boss_boom_img = 'images\\others\\boss_boom.png'
 brickwall_img = 'images\\others\\brickwall.png'
 steelwall_img = 'images\\others\\steelwall.png'
 boss_img= 'images\\others\\boss.png'
