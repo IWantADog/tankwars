@@ -2,21 +2,46 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Group
 from tank import Tank
-from ai_tank import AiTank, GiftTank, BossTank_1
+from ai_tank import AiTank, GiftTank, BossTank_1, BossTank_2
 from point import Point
 from wall import Brickwall, Steelwall
 from gift import Clock, OneLife
 from boss import Boss
 import sys
-from map import load_map_1, load_map_2
+from map import load_map_1, load_map_2, load_map_3
 from collide import player_ai_collide, player_bullet_collide, tank_wall_collide\
     , bullet_wall_collide, ai_bullent_collide, tank_boss_collide, player_gift_collide
 from config import windows_width, windows_height, background, ai_tank_tag,\
-    ai_number, number_img, player_tank_path, ai_tank_path, gift_tank_path, boss_1_path, bullet_path,\
+    number_img, player_tank_path, ai_tank_path, gift_tank_path, boss_1_path,boss_2_path, bullet_path,\
     start_img, gameover_img, start_music, shoot_music, load_images, player_img, boss_bullet_path
 
 
-def init_game(player_images, ai_images):
+def init_game(player_images, ai_images, stage):
+    if stage == 1:
+        # wall group loading map
+        wall_group = load_map_1()
+    elif stage == 2:
+        wall_group = load_map_2()
+    else:
+        wall_group = load_map_3()
+
+    # ai_tank
+    if stage == 3:
+        ai_number = 1
+        now_ai_number = 1
+        ai = BossTank_2(ai_images)
+        ai_group = Group()
+        ai_group.add(ai)
+    else:
+        ai_number = 3
+        now_ai_number = 3
+        ai_1 = AiTank(ai_images)
+        ai_2 = AiTank(ai_images)
+        ai_3 = AiTank(ai_images)
+        ai_group = Group()
+        ai_group.add(ai_1)
+        ai_group.add(ai_2)
+        ai_group.add(ai_3)
 
     # boss
     boss = Boss(450, 560)
@@ -27,30 +52,15 @@ def init_game(player_images, ai_images):
     # player
     player = Tank(player_images)
 
-    # player bullent group
+    # player bullet group
     bullet_group = Group()
 
-    # ai_tank
-    now_ai_number = 3
-    ai_1 = AiTank(ai_images)
-    ai_2 = AiTank(ai_images)
-    ai_3 = AiTank(ai_images)
-
-    # ai_tank bullent group
+    # ai_tank bullet group
     ai_bullet_group = Group()
-
-    # wall group loading map
-    wall_group = load_map_1()
 
     # tank group
     player_group = Group()
     player_group.add(player)
-
-    # ai tank group
-    ai_group = Group()
-    ai_group.add(ai_1)
-    ai_group.add(ai_2)
-    ai_group.add(ai_3)
 
     gift_group = Group()
 
@@ -101,11 +111,13 @@ if __name__ == '__main__':
     ai_images = load_images(ai_tank_path)
     gift_images = load_images(gift_tank_path)
     boss_1_images = load_images(boss_1_path)
+    boss_2_images = load_images(boss_2_path)
     boss_bullet_images = load_images(boss_bullet_path)
 
+    game_stage = 1
     #init game
     player, boss, player_group, boss_group, ai_group, bullet_group,\
-        ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images)
+        ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images, game_stage)
     play_music(music_start)
 
     # bullent images
@@ -132,9 +144,20 @@ if __name__ == '__main__':
             keys = pygame.key.get_pressed()
             if keys[K_r]:
                 game_state = 'running'
+                game_stage = 1
                 player, boss, player_group, boss_group, ai_group, bullet_group,\
-                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images,ai_images)
+                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images, game_stage)
                 play_music(music_start)
+
+        elif game_state == 'load_next':
+            game_state = 'running'
+            if game_stage == 3:
+                player, boss, player_group, boss_group, ai_group, bullet_group, \
+                ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, boss_2_images, game_stage)
+            else:
+                player, boss, player_group, boss_group, ai_group, bullet_group, \
+                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images, game_stage)
+            play_music(music_start)
 
         elif game_state == 'running':
             framerate.tick(30)
@@ -160,10 +183,10 @@ if __name__ == '__main__':
                     bullet_group.add(new_bullet)
 
             # add ai tank
-            if len(ai_group.sprites()) < 5 and now_ai_number < ai_number:
+            if game_stage != 3 and len(ai_group.sprites()) < 3 and now_ai_number < 3:
                 if now_ai_number == 6 or now_ai_number == 15:
                     ai_group.add(GiftTank(gift_images))
-                elif now_ai_number == ai_number - 1:
+                elif now_ai_number == 19:
                     ai_group.add(BossTank_1(boss_1_images))
                 else:
                     ai_group.add(AiTank(ai_images))
@@ -181,6 +204,13 @@ if __name__ == '__main__':
 
             if boss.get_life() == 0:
                 game_state = 'gameover'
+
+            if not ai_group.sprites():
+                if game_stage != 3:
+                    game_stage += 1
+                    game_state = 'load_next'
+                else:
+                    game_state = 'win'
 
             # clear ai which boom is 0(表示加载完毕了死亡图片)
             for item in ai_group.sprites():
