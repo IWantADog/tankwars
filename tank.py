@@ -15,6 +15,7 @@ class Tank(Sprite):
         self.frame = 2
         self.last_time = 0
         self.master_image = images_list
+        self.width, self.height = images_list[0].get_size()
         self.birth_image = pygame.image.load(birth_img).convert_alpha()
         self.boom_image = pygame.image.load(boom_img).convert_alpha()
         self.frame_width = self.birth_image.get_width() // 4
@@ -101,13 +102,13 @@ class Tank(Sprite):
 
             if self.point.x < 0:
                 self.point.x = 0
-            elif self.point.x > area_width - img_width:
-                self.point.x = area_width - img_width
+            elif self.point.x > area_width - self.width:
+                self.point.x = area_width - self.width
 
             if self.point.y < 0:
                 self.point.y = 0
-            elif self.point.y > area_height - img_height:
-                self.point.y = area_height - img_height
+            elif self.point.y > area_height - self.height:
+                self.point.y = area_height - self.height
 
             self.collide_dirct = {'w': False, 's': False, 'a': False, 'd': False}
 
@@ -135,8 +136,8 @@ class Tank(Sprite):
                     self.ismoved = False
 
             self.image = self.master_image[self.frame]
-            width, height = self.image.get_size()
-            self.rect = Rect(self.point.x, self.point.y, width, height)
+            self.width, self.height = self.image.get_size()
+            self.rect = Rect(self.point.x, self.point.y, self.width, self.height)
 
         elif self.birth > 0:
             frame_x = (4 - self.birth) * self.frame_width

@@ -7,8 +7,9 @@ from gift import Clock, OneLife
 
 
 class AiTank(Tank):
-    def __init__(self, tank_img): #目标坦克坐标，目标boos坐标
-        point = random.choice([(0, 0), (450, 0), (860, 0)])
+    def __init__(self, tank_img, point=None): #目标坦克坐标，目标boos坐标
+        if not point:
+            point = random.choice([(0, 0), (450, 0), (860, 0)])
         Tank.__init__(self, tank_img, point=point)
         self.state = 'notfind'               # 是否发现目标
         self.speed = 2
@@ -86,7 +87,7 @@ class BossTank_1(AiTank):
 
 class BossTank_2(AiTank):
     def __init__(self, tank_images):
-        AiTank.__init__(self, tank_img=tank_images)
+        AiTank.__init__(self, tank_img=tank_images, point=(420, 0))
         self.speed = 4
         self.name = 'boss'
         self.birth_image = pygame.image.load(boss_birth_img).convert_alpha()

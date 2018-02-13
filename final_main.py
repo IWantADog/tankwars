@@ -2,20 +2,48 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Group
 from tank import Tank
-from ai_tank import AiTank, GiftTank, BossTank
+from ai_tank import AiTank, GiftTank, BossTank_1, BossTank_2
 from point import Point
 from wall import Brickwall, Steelwall
 from gift import Clock, OneLife
 from boss import Boss
 import sys
-from map import load_map
+from map import load_map_1, load_map_2, load_map_3
 from collide import player_ai_collide, player_bullet_collide, tank_wall_collide\
     , bullet_wall_collide, ai_bullent_collide, tank_boss_collide, player_gift_collide
-from config import windows_width, windows_height, background, ai_tank_tag, player_img,\
-    ai_number, number_img, tank_img, start_img, gameover_img, start_music, shoot_music
+from config import windows_width, windows_height, background, ai_tank_tag,\
+    number_img, player_tank_path, ai_tank_path, gift_tank_path, boss_1_path,boss_2_path, bullet_path,\
+    start_img, gameover_img, start_music, shoot_music, load_images, player_img, boss_bullet_path,\
+    stage_img, stage_number_img
 
 
-def init_game():
+def init_game(player_images, ai_images, stage):
+    if stage == 1:
+        # wall group loading map
+        wall_group = load_map_1()
+    elif stage == 2:
+        wall_group = load_map_2()
+    else:
+        wall_group = load_map_3()
+
+    # ai_tank
+    if stage == 3:
+        ai_number = 1
+        now_ai_number = 1
+        ai = BossTank_2(ai_images)
+        ai_group = Group()
+        ai_group.add(ai)
+    else:
+        ai_number = 20
+        now_ai_number = 3
+        ai_1 = AiTank(ai_images)
+        ai_2 = AiTank(ai_images)
+        ai_3 = AiTank(ai_images)
+        ai_group = Group()
+        ai_group.add(ai_1)
+        ai_group.add(ai_2)
+        ai_group.add(ai_3)
+
     # boss
     boss = Boss(450, 560)
     # boss group
@@ -23,32 +51,17 @@ def init_game():
     boss_group.add(boss)
 
     # player
-    player = Tank(tank_img)
+    player = Tank(player_images)
 
-    # player bullent group
+    # player bullet group
     bullet_group = Group()
 
-    # ai_tank
-    now_ai_number = 3
-    ai_1 = AiTank()
-    ai_2 = AiTank()
-    ai_3 = AiTank()
-
-    # ai_tank bullent group
+    # ai_tank bullet group
     ai_bullet_group = Group()
-
-    # wall group loading map
-    wall_group = load_map()
 
     # tank group
     player_group = Group()
     player_group.add(player)
-
-    # ai tank group
-    ai_group = Group()
-    ai_group.add(ai_1)
-    ai_group.add(ai_2)
-    ai_group.add(ai_3)
 
     gift_group = Group()
 
@@ -79,6 +92,11 @@ if __name__ == '__main__':
 
     ai_tag = pygame.image.load(ai_tank_tag).convert_alpha()
 
+    stage = pygame.image.load(stage_img).convert_alpha()
+
+    #stage number
+    stage_number_master = pygame.image.load(stage_number_img).convert_alpha()
+
     #start image
     start_image = pygame.image.load(start_img).convert_alpha()
 
@@ -94,10 +112,22 @@ if __name__ == '__main__':
     #shoot music
     music_shoot = pygame.mixer.Sound(shoot_music)
 
+    #load images
+    player_images = load_images(player_tank_path)
+    ai_images = load_images(ai_tank_path)
+    gift_images = load_images(gift_tank_path)
+    boss_1_images = load_images(boss_1_path)
+    boss_2_images = load_images(boss_2_path)
+    boss_bullet_images = load_images(boss_bullet_path)
+
+    game_stage = 1
     #init game
-    player, boss, player_group, boss_group, ai_group, bullet_group,\
-        ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game()
-    play_music(music_start)
+    # player, boss, player_group, boss_group, ai_group, bullet_group,\
+    #     ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images, game_stage)
+    # play_music(music_start)
+
+    # bullent images
+    bullet_images = load_images(bullet_path)
 
     start_time = 0
     game_state = 'start'
@@ -110,7 +140,7 @@ if __name__ == '__main__':
             screen.blit(textImg, (295, 430))
             keys = pygame.key.get_pressed()
             if keys[K_j]:
-                game_state = 'running'
+                game_state = 'load_next'
 
         elif game_state == 'gameover':
             screen.blit(gameover_image, (270, 100))
@@ -120,17 +150,42 @@ if __name__ == '__main__':
             keys = pygame.key.get_pressed()
             if keys[K_r]:
                 game_state = 'running'
+                game_stage = 1
                 player, boss, player_group, boss_group, ai_group, bullet_group,\
-                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game()
+                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images, game_stage)
                 play_music(music_start)
 
+        elif game_state == 'win':
+            myfont_1 = pygame.font.Font(None, 80)
+            myfont_2 = pygame.font.Font(None, 30)
+            textImg_1 = myfont_1.render("YOU WIN!", True, (0, 0, 255))
+            textImg_2 = myfont_2.render("Press 'R' to try again!", True, (250, 0, 0))
+            screen.blit(textImg_1, (350, 250))
+            screen.blit(textImg_2, (380, 300))
+            keys = pygame.key.get_pressed()
+            if keys[K_r]:
+                game_stage = 1
+                game_state = 'load_next'
+
+        elif game_state == 'load_next':
+            game_state = 'running'
+            if game_stage == 3:
+                player, boss, player_group, boss_group, ai_group, bullet_group, \
+                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, boss_2_images, game_stage)
+            else:
+                player, boss, player_group, boss_group, ai_group, bullet_group, \
+                    ai_bullet_group, wall_group, gift_group, now_ai_number, tag_point = init_game(player_images, ai_images, game_stage)
+            play_music(music_start)
 
         elif game_state == 'running':
             framerate.tick(30)
             current_time = pygame.time.get_ticks()
 
-            rect = Rect(player.get_life() * 14, 0, 14, 12)
-            number_img = number_master_img.subsurface(rect)
+            number_rect = Rect(player.get_life() * 14, 0, 14, 12)
+            number_img = number_master_img.subsurface(number_rect)
+
+            stage_number = Rect((game_stage-1) * 13, 0, 13, 12)
+            stage_number_img = stage_number_master.subsurface(stage_number)
 
             keys = pygame.key.get_pressed()
             if keys[K_w]:
@@ -143,19 +198,19 @@ if __name__ == '__main__':
                 player.move('d')
 
             if keys[K_j]:
-                new_bullet = player.shoot(current_time, 300)
+                new_bullet = player.shoot(current_time, bullet_images, 300)
                 if new_bullet:
                     play_music(music_shoot)
                     bullet_group.add(new_bullet)
 
             # add ai tank
-            if len(ai_group.sprites()) < 5 and now_ai_number < ai_number:
+            if game_stage != 3 and len(ai_group.sprites()) < 5 and now_ai_number < 20:
                 if now_ai_number == 6 or now_ai_number == 15:
-                    ai_group.add(GiftTank())
-                elif now_ai_number == ai_number - 1:
-                    ai_group.add(BossTank())
+                    ai_group.add(GiftTank(gift_images))
+                elif now_ai_number == 19:
+                    ai_group.add(BossTank_1(boss_1_images))
                 else:
-                    ai_group.add(AiTank())
+                    ai_group.add(AiTank(ai_images))
                 now_ai_number += 1
 
             # clear bullet
@@ -170,6 +225,13 @@ if __name__ == '__main__':
 
             if boss.get_life() == 0:
                 game_state = 'gameover'
+
+            if not ai_group.sprites():
+                if game_stage != 3:
+                    game_stage += 1
+                    game_state = 'load_next'
+                else:
+                    game_state = 'win'
 
             # clear ai which boom is 0(表示加载完毕了死亡图片)
             for item in ai_group.sprites():
@@ -188,7 +250,11 @@ if __name__ == '__main__':
             # ai move&shooting module
             for ai in ai_group.sprites():
                 ai.ai_move(current_time, player.get_point(), boss.get_point(), rate=3000)
-                ai_tank_bullet = ai.ai_shoot(current_time, 300)
+                if ai.get_name() == 'boss':
+                    ai_tank_bullet = ai.ai_shoot(current_time, boss_bullet_images, 300)
+                else:
+                    ai_tank_bullet = ai.ai_shoot(current_time, bullet_images, 300)
+
                 if ai_tank_bullet:
                     ai_bullet_group.add(ai_tank_bullet)
 
@@ -254,6 +320,8 @@ if __name__ == '__main__':
             screen.blit(bg, (900, 0))
             screen.blit(p_img, (925, 400))
             screen.blit(number_img, (950, 400))
+            screen.blit(stage, (925, 430))
+            screen.blit(stage_number_img, (950, 450))
             for tag in tag_point:
                 screen.blit(ai_tag, tag)
 

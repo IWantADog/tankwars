@@ -60,6 +60,8 @@ player_img = 'images\\others\\player.png'
 number_img = 'images\\others\\number.png'
 start_img = 'images\\others\\start.png'
 gameover_img = 'images\\others\\gameover.png'
+stage_img = 'images\\others\\stage.png'
+stage_number_img = 'images\\others\\stage_number.png'
 
 
 def load_images(images_list):
