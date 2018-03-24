@@ -83,12 +83,14 @@ class BossTank_1(AiTank):
     def __init__(self, tank_images):
         AiTank.__init__(self, tank_img=tank_images)
         self.speed = 4
+        self.life_number = 8
         self.name = 'boss'
 
 class BossTank_2(AiTank):
     def __init__(self, tank_images):
         AiTank.__init__(self, tank_img=tank_images, point=(420, 0))
         self.speed = 4
+        self.life_number = 10
         self.name = 'boss'
         self.birth_image = pygame.image.load(boss_birth_img).convert_alpha()
         self.boom_image = pygame.image.load(boss_boom_img).convert_alpha()
@@ -96,8 +98,6 @@ class BossTank_2(AiTank):
         self.frame_height = self.birth_image.get_height()
         self.distance = 250
         self.range = 40
-
-
 
 
 

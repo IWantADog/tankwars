@@ -16,7 +16,6 @@ class Bullet(pygame.sprite.Sprite):
         self.start_point = None
         self.dire = None
         self.speed = 8
-        self.last_time = None
         self.islive = True
         self.master_image = bullent_images
         self.frame = None

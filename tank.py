@@ -25,6 +25,7 @@ class Tank(Sprite):
         self.last_frame = self.first_frame + columns - 1
 
         self.life = 0                        # 生命值为3
+        self.life_number = 3
         self.birth = 4                       # 诞生动态图片
         self.boom = 7                        # 死亡动态图片
         self.ismoved = False                 # 是否移动
@@ -146,7 +147,7 @@ class Tank(Sprite):
             self.image = self.birth_image.subsurface(rect)
             self.birth -= 1
             if self.birth == 0:
-                self.life = 3           # 当加载完诞生图片时，将life赋为3
+                self.life = self.life_number           # 当加载完诞生图片时，将life赋为3
         elif self.boom > 0:
             frame_x = (7 - self.boom) * self.frame_width
             frame_y = 0
