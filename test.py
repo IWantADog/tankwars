@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 from pygame.sprite import Group
-from tank import Tank
+from tank_old2 import Tank
 from ai_tank import AiTank, GiftTank, BossTank_1, BossTank_2
 from point import Point
 from wall import Brickwall, Steelwall

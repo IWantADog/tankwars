@@ -4,6 +4,7 @@ from pygame.sprite import Sprite, Group
 from point import Point
 from bullet import Bullet, load_bullet_images
 from wall import Brickwall
+from collide import player_ai_collide, tank_wall_collide
 import sys
 from config import img_width, img_height, bullet_height, bullet_width,\
     birth_img, boom_img, windows_height, windows_width, area_height, area_width\
@@ -32,10 +33,9 @@ class Tank(Sprite):
         self.dirct = 'w'                     # 方向
         self.old_dirct = -1                  # 上一次的方向
         self.point = Point(point)                   # 位置
-        self.speed = 3                       # 速度
+        self.speed = 3.0                     # 速度
         self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
         self.collide_dirct = {'w': False, 's': False, 'a': False, 'd': False}  # 碰撞方向
-
         #bullet
         self.last_shoot_time = 0
 
@@ -61,13 +61,16 @@ class Tank(Sprite):
     def get_birth(self):
         return self.birth
 
-    def move(self, dire): #direction
+    def move(self, dire, group): #direction
         if self.life > 0:
             self.ismoved = True
             self.dirct = dire
             if dire == 'w':
-                if not self.collide_dirct['w']:
-                    self.point.y -= self.speed
+                self.point.y -= self.speed
+                player_ai_collide(self, group)
+                if self.collide_dirct['w']:
+                    self.point.y += self.speed
+
                 if dire != self.old_dirct:
                     self.frame = 2
                     self.first_frame = 2
@@ -75,8 +78,11 @@ class Tank(Sprite):
                     self.old_dirct = dire
 
             elif dire == 's':
-                if not self.collide_dirct['s']:
-                    self.point.y += self.speed
+                self.point.y += self.speed
+                player_ai_collide(self, group)
+                if self.collide_dirct['s']:
+                    self.point.y -= self.speed
+
                 if dire != self.old_dirct:
                     self.frame = 6
                     self.first_frame = 6
@@ -84,8 +90,11 @@ class Tank(Sprite):
                     self.old_dirct = dire
 
             elif dire == 'a':
-                if not self.collide_dirct['a']:
-                    self.point.x -= self.speed
+                self.point.x -= self.speed
+                player_ai_collide(self, group)
+                if self.collide_dirct['a']:
+                    self.point.x += self.speed
+
                 if dire != self.old_dirct:
                     self.frame = 0
                     self.first_frame = 0
@@ -93,8 +102,11 @@ class Tank(Sprite):
                     self.old_dirct = dire
 
             elif dire == 'd':
-                if not self.collide_dirct['d']:
-                    self.point.x += self.speed
+                self.point.x += self.speed
+                player_ai_collide(self, group)
+                if self.collide_dirct['d']:
+                    self.point.x -= self.speed
+
                 if dire != self.old_dirct:
                     self.frame = 4
                     self.first_frame = 4
@@ -181,16 +193,16 @@ if __name__ == '__main__':
     group.add(tt)
 
     #ai tank
-    ai_tank = load_images(ai_tank_path)
-    ai_t = AiTank(ai_tank)
-    ai_group = Group()
-    ai_group.add(ai_t)
+    # ai_tank = load_images(ai_tank_path)
+    # ai_t = AiTank(ai_tank)
+    # ai_group = Group()
+    # ai_group.add(ai_t)
 
     #player bullent
     bullet_group = Group()
 
     #ai bullet
-    ai_bullet_group = Group()
+    # ai_bullet_group = Group()
 
     #wall group
     wall_group = Group()
@@ -230,15 +242,15 @@ if __name__ == '__main__':
             if not bullet.islive:
                 bullet_group.remove(bullet)
                 # passj
-        for ai in ai_group.sprites():
-            ai.ai_move(current_time, p_tank.get_point(), p_tank.get_point(), rate=3000)
-            ai_tank_bullet = ai.ai_shoot(current_time, 300)
-            if ai_tank_bullet:
-                ai_bullet_group.add(ai_tank_bullet)
-
-        for bullet in ai_bullet_group.sprites():
-            if not bullet.islive:
-                ai_bullet_group.remove(bullet)
+        # for ai in ai_group.sprites():
+        #     ai.ai_move(current_time, p_tank.get_point(), p_tank.get_point(), rate=3000)
+        #     ai_tank_bullet = ai.ai_shoot(current_time, 300)
+        #     if ai_tank_bullet:
+        #         ai_bullet_group.add(ai_tank_bullet)
+        #
+        # for bullet in ai_bullet_group.sprites():
+        #     if not bullet.islive:
+        #         ai_bullet_group.remove(bullet)
 
         # print('1111 ', len(bullet_group.sprites()))
         screen.fill((0,0,0))
@@ -246,14 +258,14 @@ if __name__ == '__main__':
         group.update(current_time)
         group.draw(screen)
 
-        ai_group.update(current_time)
-        ai_group.draw(screen)
+        # ai_group.update(current_time)
+        # ai_group.draw(screen)
 
         bullet_group.update()
         bullet_group.draw(screen)
 
-        ai_bullet_group.update()
-        ai_bullet_group.draw(screen)
+        # ai_bullet_group.update()
+        # ai_bullet_group.draw(screen)
 
         #wall_group
         wall_group.update()

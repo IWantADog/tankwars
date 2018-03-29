@@ -189,13 +189,13 @@ if __name__ == '__main__':
 
             keys = pygame.key.get_pressed()
             if keys[K_w]:
-                player.move('w')
+                player.move('w', ai_group)
             elif keys[K_s]:
-                player.move('s')
+                player.move('s', ai_group)
             elif keys[K_a]:
-                player.move('a')
+                player.move('a', ai_group)
             elif keys[K_d]:
-                player.move('d')
+                player.move('d', ai_group)
 
             if keys[K_j]:
                 new_bullet = player.shoot(current_time, bullet_images, 300)
@@ -249,7 +249,7 @@ if __name__ == '__main__':
 
             # ai move&shooting module
             for ai in ai_group.sprites():
-                ai.ai_move(current_time, player.get_point(), boss.get_point(), rate=3000)
+                ai.ai_move(current_time, player.get_point(), boss.get_point(), player_group, rate=3000)
                 if ai.get_name() == 'boss':
                     ai_tank_bullet = ai.ai_shoot(current_time, boss_bullet_images, 300)
                 else:
@@ -263,7 +263,7 @@ if __name__ == '__main__':
                     ai_bullet_group.remove(bullet)
 
             #player-ai collide
-            player_ai_collide(player, ai_group)
+            # player_ai_collide(player, ai_group)
 
             # ai ai collide
             for ai in ai_group.sprites():

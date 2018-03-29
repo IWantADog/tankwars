@@ -19,7 +19,6 @@ def get_collide_dirct(ppoint, apoint):
             return 'a', 'd'
         else:
             return 'd', 'a'
-    print(x,'   ', y)
 
 # def player_ai_collide(player, ai_group):
 #     collide_list = pygame.sprite.spritecollide(player, ai_group, False)
