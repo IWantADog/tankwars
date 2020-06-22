@@ -1,30 +1,28 @@
 import pygame
 from tank import Tank
-from config import boss_birth_img, boss_boom_img
+from config import boss_birth_img, boss_boom_img, ai_tank_path
 import random
 from point import Point
 from gift import Clock, OneLife
 
 
 class RobotTank(Tank):
-    def __init__(self, point=None): #目标坦克坐标，目标boos坐标
+    master_images_path = ai_tank_path
+    def __init__(self, point=None, **kw): #目标坦克坐标，目标boos坐标
         if not point:
             point = (random.uniform(0, 960), 0)
-        Tank.__init__(self, point=point)
+        Tank.__init__(self, point=point, **kw)
         self.state = 'notfind'               # 是否发现目标
-        self.speed = 2.0
+        self.speed = kw.get('speed', 2.0)
         self.last_move_time = 0
-        self.name = 'ai'
-        self.distance = 150.0
-        self.range = 40.0
+        self.name = kw.get('name','ai')
+        self.distance = kw.get('distance', 150.0)
+        self.range = kw.get('range', 40.0)
 
     def find_aim(self, aim_tank, aim_boss):   # 返回ai需要移动的方向
         tank_x, tank_y = self.point.get()
         aim_tank_x, aim_tank_y = aim_tank.get()
         aim_boss_x, aim_boss_y = aim_boss.get()
-        # print('tank_x:', tank_x, ' ,tank_y:', tank_y)
-        # print('ai_tank_x:', aim_tank_x, ' ,aim_tank_y:', aim_tank_y)
-        # print(self.collide_dirct)
 
         self.state = 'finded'
         if -self.range < tank_x - aim_boss_x < self.range:
@@ -72,7 +70,6 @@ class RobotTank(Tank):
         if self.state == 'finded':
             return self.shoot(current_time=current_time, bullet_images=bullet_images, rate=rate)
 
-
 class GiftTank(RobotTank):
     def __init__(self):
         super().__init__(self)
@@ -82,21 +79,13 @@ class GiftTank(RobotTank):
         gift_list = [Clock(self.point), OneLife(self.point)]
         return random.choice(gift_list)
 
-class BossTank_1(RobotTank):
-    def __init__(self):
-        super().__init__(self)
-        self.speed = 4
-        self.life_number = 8
-        self.name = 'boss'
+def create_boss_tank_1():
+    return RobotTank(speed=4, life_number=8, name='boss')
 
-class BossTank_2(RobotTank):
-    def __init__(self):
-        super().__init__(self, point=(420, 0))
-        self.speed = 4
-        self.life_number = 10
-        self.name = 'boss'
-        self.distance = 250
-        self.range = 40
+def create_boss_tank_2():
+    return RobotTank(
+        point=(420, 0), speed=4, life_number=10, name='boss', distance=250, range=40
+    )
 
 
 
