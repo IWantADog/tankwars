@@ -1,15 +1,14 @@
 import pygame
 from point import Point
 from pygame import Rect
-from config import bullet_height, bullet_width, area_width, area_height
 
-def load_bullet_images():
-    images_name_list = ['images\\bullet\\up.png', 'images\\bullet\\down.png',
-                        'images\\bullet\\right.png', 'images\\bullet\\left.png']
-    return [pygame.image.load(item).convert_alpha() for item in images_name_list]
+from config import bullet_height, bullet_width, area_width, area_height, bullet_path
+
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, bullent_images):
+    master_image = None
+    
+    def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         # 位置 方向 速度
         self.point = None
@@ -17,14 +16,12 @@ class Bullet(pygame.sprite.Sprite):
         self.dire = None
         self.speed = 8
         self.islive = True
-        self.master_image = bullent_images
         self.frame = None
         self.width, self.height = None, None
-
-    # def load(self, width=bullet_width, height=bullet_height):
-    #     self.master_imge = pygame.image.load(shoot_img).convert_alpha()
-    #     self.frame_width = width
-    #     self.frame_height = height
+    
+    def load_images(self):
+        if not Bullet.master_image:
+            Bullet.master_image = [pygame.image.load(item).convert_alpha() for item in bullet_path]
 
     def choose_dire(self, dire):
         self.dire = dire
@@ -37,7 +34,7 @@ class Bullet(pygame.sprite.Sprite):
         elif dire == 'a':
             self.frame = 3
 
-        self.image = self.master_image[self.frame]
+        self.image = Bullet.master_image[self.frame]
         self.width, self.height = self.image.get_size()
 
     def lanch(self, point): # 位置 方向
