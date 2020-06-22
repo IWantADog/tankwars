@@ -2,7 +2,7 @@
 
 a simple game that written by python and [pygame](https://www.pygame.org/).
 
-## requriments
+## requirements
 
 - python>=3.5
 - pygame==1.9.2
