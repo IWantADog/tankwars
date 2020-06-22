@@ -11,9 +11,15 @@ from collide import player_ai_collide, tank_wall_collide
 from config import *
 
 class Tank(Sprite):
-    master_image = None
+    master_images_path = None
+    birth_images_path = birth_img
+    boom_images_path = boom_img
 
-    def __init__(self, columns=2, point=default_point):
+    master_images = None
+    birth_images = None
+    boom_images = None
+
+    def __init__(self, columns=2, point=default_point, **kw):
         Sprite.__init__(self)
         self.frame = 2
         self.last_time = 0
@@ -23,7 +29,7 @@ class Tank(Sprite):
         self.last_frame = self.first_frame + columns - 1
 
         self.life = 0                        # 生命值为3
-        self.life_number = 3
+        self.life_number = kw.get('life_number', 3)
         self.birth = 4                       # 诞生动态图片
         self.boom = 7                        # 死亡动态图片
         self.ismoved = False                 # 是否移动
@@ -35,26 +41,21 @@ class Tank(Sprite):
         #bullet
         self.last_shoot_time = 0
     
-    def load_images(self, images=None, birth_imgs=None, boom_imgs=None):
-        if images is None:
-            images = player_tank_path
+    def load_images(self):
+        assert self.master_images_path, 'tank master images is None'
+        if self.master_images is None:
+            self.master_images = [pygame.image.load(item).convert_alpha() for item in self.master_images_path]
 
-        if birth_imgs is None:
-            birth_imgs = birth_img
+        if self.birth_images is None:
+            self.birth_images = pygame.image.load(self.birth_images_path).convert_alpha()
 
-        if boom_imgs is None:
-            boom_imgs = boom_img
+        if self.boom_images is None:
+            self.boom_images = pygame.image.load(self.boom_images_path).convert_alpha()
 
-        # TODO 减少图片的加入数量，所有的图片仅载入一次
-        self.master_image = [pygame.image.load(item).convert_alpha() for item in images]
-
-        self.width, self.height = self.master_image[0].get_size()
-        self.birth_image = pygame.image.load(birth_imgs).convert_alpha()
-        self.boom_image = pygame.image.load(boom_imgs).convert_alpha()
-        self.frame_width = self.birth_image.get_width() // 4
-        self.frame_height = self.birth_image.get_height()
+        self.width, self.height = self.master_images[0].get_size()
+        self.frame_width = self.birth_images.get_width() // 4
+        self.frame_height = self.birth_images.get_height()
         self.rect = Rect(self.point.x, self.point.y, self.frame_width, self.frame_height)
-
 
     def get_point(self):
         return self.point
@@ -165,7 +166,7 @@ class Tank(Sprite):
                     self.last_time = current_time
                     self.ismoved = False
 
-            self.image = self.master_image[self.frame]
+            self.image = self.master_images[self.frame]
             self.width, self.height = self.image.get_size()
             self.rect = Rect(self.point.x, self.point.y, self.width, self.height)
 
@@ -173,7 +174,7 @@ class Tank(Sprite):
             frame_x = (4 - self.birth) * self.frame_width
             frame_y = 0
             rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
-            self.image = self.birth_image.subsurface(rect)
+            self.image = self.birth_images.subsurface(rect)
             self.birth -= 1
             if self.birth == 0:
                 self.life = self.life_number           # 当加载完诞生图片时，将life赋为3
@@ -181,11 +182,12 @@ class Tank(Sprite):
             frame_x = (7 - self.boom) * self.frame_width
             frame_y = 0
             rect = Rect(frame_x, frame_y, self.frame_width, self.frame_height)
-            self.image = self.boom_image.subsurface(rect)
+            self.image = self.boom_images.subsurface(rect)
             self.boom -= 1
 
 
 class PlayerTank(Tank):
+    master_images_path = player_tank_path
     def controller(self, keys, current_time):
         if keys[K_w]:
             self.move('w')
