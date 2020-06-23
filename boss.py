@@ -2,10 +2,10 @@ import pygame
 from pygame.locals import *
 from pygame.sprite import Sprite
 from point import Point
-from config import brickwall_img, steelwall_img, boss_img, img_width, img_height
+from config import brickwall_img, steelwall_img, boss_img, img_width, img_heights
 
 class Boss(Sprite):
-    def __init__(self, point_x, point_y):
+    def __init__(self, point_x=450, point_y=560):
         Sprite.__init__(self)
         self.life = 1
         self.master_img = pygame.image.load(boss_img).convert_alpha()
