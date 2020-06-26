@@ -11,7 +11,6 @@ from point import Point
 from wall import Brickwall
 from bullet import Bullet
 from boss import Boss
-from collide import player_ai_collide, tank_wall_collide
 
 MUSCI = 'music/start.ogg'
 
@@ -42,6 +41,7 @@ class Environment:
         self.group_gift = Group()
         self.boss = None
         self.size = (900, 600)
+        self.start_time = 0
         
     def bulid(self):
         start_music = pygame.mixer.Sound(MUSCI)
@@ -76,22 +76,39 @@ class Environment:
         if not self.boss:
             self.boss = Boss()
         return self.boss
+    
+    def update(self, current_time):
+        self.update_spirtes(current_time)
+        self.update_scrren(current_time)
 
     def update_spirtes(self, current_time):
+        # update player bullet
         for bullet in self.group_bullet_player.sprites():
             if not bullet.islive:
                 self.group_bullet_player.remove(bullet)
 
-        for robot in self.group_bullet_robot.sprites():
-            # TODO robot move rewrite
-            # robot.ai_move(current_time, tt.get_point(), ai_t.get_point(), rate=3000)
-            robot_tank_bullet = robot.ai_shoot(current_time, 300)
-            if robot_tank_bullet:
-                self.group_bullet_robot.add(robot_tank_bullet)
+        # update robot tank
+        for robot in self.group_robot.sprites():
+            if robot.boom == 0:
+                if robot.name == 'gift':
+                    self.group_gift.add(robot.leave_gift())
+                self.group_robot.remove(robot)
+            else:
+                # TODO robot move rewrite
+                # robot.ai_move(current_time, tt.get_point(), ai_t.get_point(), rate=3000)
+                robot_tank_bullet = robot.ai_shoot(current_time, 300)
+                if robot_tank_bullet:
+                    self.group_bullet_robot.add(robot_tank_bullet)
         
+        # update robot bullet
         for bullet in self.group_bullet_robot.sprites():
             if not bullet.islive:
                 self.group_bullet_robot.remove(bullet)
+        
+        # update wall
+        for wall in self.group_wall.sprites():
+            if wall.life <= 0:
+                self.group_wall.remove(wall)
 
     def update_scrren(self, current_time):
         self.screen.fill((0,0,0))
@@ -112,9 +129,9 @@ class Environment:
         self.group_wall.update()
         self.group_wall.draw(self.screen)
     
-    def check_collide(self, current_time, start_time):
+    def check_collide(self, current_time):
         self.player_bullet_collide()
-        self.player_gift_collide(current_time, start_time)
+        self.player_gift_collide(current_time)
         self.robot_bullent_collide()
         self.player_bullet_collide()
         self.tank_wall_collide()
@@ -133,7 +150,7 @@ class Environment:
                     player.set_collide_dirct(pd)
                     robot.set_collide_dirct(ad)
 
-    def player_gift_collide(self, current_time, start_time):
+    def player_gift_collide(self, current_time):
         collide_list = []
         for player in self.group_player:
             emp_collide_list = pygame.sprite.spritecollide(player, self.group_gift, True)
@@ -141,7 +158,7 @@ class Environment:
 
         for gift in collide_list:
             if gift.name == 'clock':
-                start_time = current_time
+                self.start_time = current_time
                 for ai in self.group_robot.sprites():
                     ai.state = 'clock'
             elif gift.name == 'onelife':
@@ -149,15 +166,14 @@ class Environment:
 
         for ai in self.group_robot.sprites():
             if ai.state == 'clock':
-                if current_time <= start_time + 5000:
+                if current_time <= self.start_time + 5000:
                     for a in self.group_robot:
                         a.state = 'clock'
                 else:
                     for a in self.group_robot:
                         a.state = 'notfind'
                 break
-        return start_time
-    
+
     # refactor
     def player_bullet_collide(self):
         for item in self.group_robot.sprites():
