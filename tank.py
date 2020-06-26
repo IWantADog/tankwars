@@ -6,7 +6,6 @@ from pygame.sprite import Sprite, Group
 from point import Point
 from bullet import Bullet
 from wall import Brickwall
-from collide import player_ai_collide, tank_wall_collide
 
 from config import *
 
@@ -85,7 +84,6 @@ class Tank(Sprite):
             self.dirct = dire
             if dire == 'w':
                 self.point.y -= self.speed
-                player_ai_collide(self, group)
                 if self.collide_dirct['w']:
                     self.point.y += self.speed
 
@@ -97,7 +95,6 @@ class Tank(Sprite):
 
             elif dire == 's':
                 self.point.y += self.speed
-                player_ai_collide(self, group)
                 if self.collide_dirct['s']:
                     self.point.y -= self.speed
 
@@ -109,7 +106,6 @@ class Tank(Sprite):
 
             elif dire == 'a':
                 self.point.x -= self.speed
-                player_ai_collide(self, group)
                 if self.collide_dirct['a']:
                     self.point.x += self.speed
 
@@ -121,7 +117,6 @@ class Tank(Sprite):
 
             elif dire == 'd':
                 self.point.x += self.speed
-                player_ai_collide(self, group)
                 if self.collide_dirct['d']:
                     self.point.x -= self.speed
 
@@ -188,6 +183,17 @@ class Tank(Sprite):
 
 class PlayerTank(Tank):
     master_images_path = player_tank_path
+    music_shoot = None 
+
+    def __init__(self):
+        super(PlayerTank, self).__init__()
+        self.channel = pygame.mixer.find_channel(True)
+        self.channel.set_volume(0.5)
+
+    def load_music(self):
+        if not PlayerTank.music_shoot:
+            PlayerTank.music_shoot = pygame.mixer.Sound(shoot_music) 
+        
     def controller(self, keys, current_time):
         if keys[K_w]:
             self.move('w')
@@ -201,6 +207,9 @@ class PlayerTank(Tank):
             pass
 
         if keys[K_j]:
+            # play shoot music
+            if getattr(self, 'music_shoot'):
+                self.channel.play(PlayerTank.music_shoot)
             return self.shoot(current_time, 300)
 
         return None
