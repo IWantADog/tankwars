@@ -1,8 +1,9 @@
 import pygame
 from pygame.locals import *
 from pygame.sprite import Sprite
-from point import Point
-from config import brickwall_img, steelwall_img, boss_img, img_width, img_heights
+from .point import Point
+
+from config import brickwall_img, steelwall_img, boss_img, img_width, img_height
 
 class Boss(Sprite):
     def __init__(self, point_x=450, point_y=560):

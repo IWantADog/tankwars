@@ -1,16 +1,19 @@
+import sys
+
 import pygame
 from pygame.locals import *
 from pygame.sprite import Sprite, Group
 
-import sys
+from .tank import Tank
+from .robot_tank import RobotTank
+from .point import Point
+from .wall import Brickwall, Steelwall
+from .bullet import Bullet
+from .boss import Boss
+from .exceptions import AddWallToEnvironmentError
 
 from config import *
-from tank import Tank
-from robot_tank import RobotTank
-from point import Point
-from wall import Brickwall
-from bullet import Bullet
-from boss import Boss
+
 
 MUSCI = 'music/start.ogg'
 
@@ -32,7 +35,7 @@ def get_collide_dirct(ppoint, apoint):
             return 'd', 'a'
 
 class Environment:
-    def __init__(self):
+    def __init__(self, size=(900, 600)):
         self.group_player = Group()
         self.group_robot = Group()
         self.group_bullet_player = Group()
@@ -40,8 +43,9 @@ class Environment:
         self.group_wall = Group()
         self.group_gift = Group()
         self.boss = None
-        self.size = (900, 600)
+        self.size = size 
         self.start_time = 0
+        self.game_stage = 1
         
     def bulid(self):
         start_music = pygame.mixer.Sound(MUSCI)
@@ -53,6 +57,21 @@ class Environment:
         pygame.display.set_caption('Tank Wars')
 
         self.framerate = pygame.time.Clock()
+
+    def load_images(self):
+        self.bg = pygame.image.load(background).convert()
+        self.p_img = pygame.image.load(player_img).convert_alpha()
+        self.ai_tag = pygame.image.load(ai_tank_tag).convert_alpha()
+        self.stage = pygame.image.load(stage_img).convert_alpha()
+        self.tank_tags = [(925+(i%2)*25, 100+(i//2)*25) for i in range(ai_number)]
+        #stage numbers
+        self.stage_number_master = pygame.image.load(stage_number_img).convert_alpha()
+        #start image
+        self.start_image = pygame.image.load(start_img).convert_alpha()
+        #gameover image
+        self.gameover_image = pygame.image.load(gameover_img).convert_alpha()
+        #player life image
+        self.number_master_img = pygame.image.load(number_img).convert_alpha()
 
     def add_player(self, player):
         self.group_player.add(player)
@@ -67,7 +86,15 @@ class Environment:
         self.group_bullet_robot.add(bullet)
     
     def add_wall(self, wall):
-        self.group_wall.add(wall)
+        if isinstance(wall, (Brickwall, Steelwall)):
+            self.group_wall.add(wall)
+        elif isinstance(wall, list):
+            for obj in wall:
+                self.group_wall.add(obj)
+        elif isinstance(wall, Group):
+            self.group_wall = wall
+        else:
+            raise AddWallToEnvironmentError()
     
     def add_gift(self, gift):
         self.group_gift.add(gift)
@@ -80,6 +107,26 @@ class Environment:
     def update(self, current_time):
         self.update_spirtes(current_time)
         self.update_scrren(current_time)
+        self.update_background()
+    
+    def load_map(self, maps):
+        pass
+
+    def update_background(self):
+        player = self.group_player.sprites()[0]
+        number_rect = Rect(player.get_life() * 14, 0, 14, 12)
+        number_img = self.number_master_img.subsurface(number_rect)
+
+        stage_number = Rect((self.game_stage-1) * 13, 0, 13, 12)
+        stage_number_img = self.stage_number_master.subsurface(stage_number)
+        
+        self.screen.blit(self.bg, (900, 0))
+        self.screen.blit(self.p_img, (925, 400))
+        self.screen.blit(number_img, (950, 400))
+        self.screen.blit(self.stage, (925, 430))
+        self.screen.blit(stage_number_img, (950, 450))
+        for tag in self.tank_tags:
+            self.screen.blit(self.ai_tag, tag)
 
     def update_spirtes(self, current_time):
         # update player bullet
@@ -93,6 +140,8 @@ class Environment:
                 if robot.name == 'gift':
                     self.group_gift.add(robot.leave_gift())
                 self.group_robot.remove(robot)
+                if self.tank_tags:
+                        self.tank_tags.pop()
             else:
                 # TODO robot move rewrite
                 # robot.ai_move(current_time, tt.get_point(), ai_t.get_point(), rate=3000)

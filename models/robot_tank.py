@@ -1,9 +1,12 @@
 import pygame
-from tank import Tank
-from config import boss_birth_img, boss_boom_img, ai_tank_path
 import random
-from point import Point
-from gift import Clock, OneLife
+
+from .tank import Tank
+from .point import Point
+from .gift import Clock, OneLife
+
+from config import boss_birth_img, boss_boom_img, ai_tank_path
+
 
 
 class RobotTank(Tank):

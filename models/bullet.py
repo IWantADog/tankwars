@@ -1,7 +1,7 @@
 import pygame
-from point import Point
 from pygame import Rect
 
+from .point import Point
 from config import bullet_height, bullet_width, area_width, area_height, bullet_path
 
 

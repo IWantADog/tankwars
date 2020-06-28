@@ -1,7 +1,9 @@
 import pygame
 from pygame.locals import *
 from pygame.sprite import Sprite, Group
-from point import Point
+
+from .point import Point
+
 from config import clock_img, one_life_img
 
 

@@ -1,0 +1,2 @@
+class AddWallToEnvironmentError(Exception):
+    pass

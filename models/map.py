@@ -1,8 +1,10 @@
-import pygame
-from wall import Steelwall, Brickwall
-from pygame.sprite import Group
-from point import Point
 import sys
+
+import pygame
+from pygame.sprite import Group
+
+from .wall import Steelwall, Brickwall
+from .point import Point
 
 def load_map_1():
     brickwall_point_1 = [(150, 100+i*40) for i in range(3)]

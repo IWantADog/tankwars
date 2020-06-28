@@ -3,9 +3,10 @@ import sys
 import pygame
 from pygame.locals import *
 from pygame.sprite import Sprite, Group
-from point import Point
-from bullet import Bullet
-from wall import Brickwall
+
+from .point import Point
+from .bullet import Bullet
+from .wall import Brickwall
 
 from config import *
 
